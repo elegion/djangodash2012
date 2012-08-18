@@ -17,23 +17,6 @@ class Method:
 method_choices = [(f, f) for f in dir(Method) if not f.startswith('_')]
 
 
-class TestProject(models.Model):
-    """
-    Test project.
-
-    Contains info about API being tested and multiple test cases.
-
-    """
-    slug = AutoSlugField(populate_from='name')
-    name = models.CharField(max_length=100)
-
-    base_url = models.URLField()
-    common_params = ParamsField(blank=True, null=True)
-
-    class Meta:
-        abstract = True
-
-
 class Params(models.Model):
     """ HTTP request parameters for test cases. """
     pass

@@ -3,6 +3,7 @@ from jsonfield import JSONField
 import requests
 
 from fortuitus.feditor import models_base
+from fortuitus.feditor.models import TestProject
 
 
 class TestResult:
@@ -25,8 +26,10 @@ class TestCase(models_base.TestCase):
 
     See also :model:`feditor.TestCase`
     """
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
+    project = models.ForeignKey(TestProject, related_name='test_runs')
+
+    start_date = models.DateTimeField(null=True, blank=True)
+    end_date = models.DateTimeField(null=True, blank=True)
     result = models.CharField(max_length=10, choices=TEST_CASE_RESULT_CHOICES, blank=False, null=True)
 
     def run(self):
@@ -48,13 +51,13 @@ class TestCaseStep(models_base.TestCaseStep):
     """
     testcase = models.ForeignKey(TestCase, related_name='steps')
 
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
+    start_date = models.DateTimeField(null=True, blank=True)
+    end_date = models.DateTimeField(null=True, blank=True)
     result = models.CharField(max_length=10, choices=TEST_CASE_RESULT_CHOICES, blank=False, null=True)
 
-    response_code = models.PositiveSmallIntegerField()
-    response_headers = JSONField()
-    response_body = models.TextField()
+    response_code = models.PositiveSmallIntegerField(null=True, blank=True)
+    response_headers = JSONField(null=True, blank=True)
+    response_body = models.TextField(null=True, blank=True)
 
     def run(self, responses):
         r = requests.request(self.method, self.url)

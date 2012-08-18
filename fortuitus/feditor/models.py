@@ -1,10 +1,12 @@
+from autoslug.fields import AutoSlugField
 from django.db import models
 
 from fortuitus.fcore.models import Company
 from fortuitus.feditor import models_base
+from fortuitus.feditor.dbfields import ParamsField
 
 
-class TestProject(models_base.TestProject):
+class TestProject(models.Model):
     """
     Test project.
 
@@ -12,6 +14,11 @@ class TestProject(models_base.TestProject):
 
     """
     company = models.ForeignKey(Company)
+    slug = AutoSlugField(populate_from='name')
+    name = models.CharField(max_length=100)
+
+    base_url = models.URLField()
+    common_params = ParamsField(blank=True, null=True)
 
     def __unicode__(self):
         return u'%s (%s)' % (self.name, self.base_url)
@@ -47,7 +54,7 @@ class TestCaseStep(models_base.TestCaseStep):
 
     Contains info about test requests and multiple assertions.
     """
-    testcase = models.ForeignKey(TestCase)
+    testcase = models.ForeignKey(TestCase, related_name='steps')
 
     def __unicode__(self):
         return self.url
@@ -59,4 +66,4 @@ class TestCaseAssert(models_base.TestCaseAssert):
 
     Contains assertions for a test case step.
     """
-    step = models.ForeignKey(TestCaseStep)
+    step = models.ForeignKey(TestCaseStep, related_name='assertions')
