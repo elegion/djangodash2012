@@ -15,7 +15,7 @@ class Method:
 
 
 method_choices = [(f, f) for f in dir(Method) if not f.startswith('_')]
-operator_choices = [('=', '=')]
+operator_choices = [('Eq', '=')]
 
 
 class Params(models.Model):
@@ -73,7 +73,7 @@ class TestCaseAssert(models.Model):
 
     lhs = models.CharField(max_length=256, default='')
     rhs = models.CharField(max_length=256, default='')
-    operator = models.CharField(max_length='16', choices=operator_choices,
+    operator = models.CharField(max_length=256, choices=operator_choices,
                                 default=operator_choices[0][0])
 
     class Meta:
