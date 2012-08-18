@@ -7,6 +7,25 @@ from fortuitus.feditor.params import Params, PlainValue, RandomValue
 
 
 class ParamsTestCase(TestCase):
+    def test_serialize(self):
+        length = 6
+        symbols = string.digits
+        login = 'test_login'
+
+        params = Params()
+        params['login'] = PlainValue('test_login')
+        params['password'] = RandomValue(length=6, symbols=symbols)
+        password = unicode(params['password'])
+
+        params2 = Params().loads(params.dumps())
+        self.assertEquals(unicode(params2['login']), login)
+        password2 = unicode(params2['password'])
+        self.assertEquals(len(password2), length)
+        for char in password2:
+            self.assertTrue(char in symbols)
+        #random should regenerate each time
+        self.assertNotEquals(password2, password)
+
     def test_plain(self):
         param = Params()
         param['login'] = PlainValue('test_login')

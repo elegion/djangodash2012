@@ -1,10 +1,28 @@
 from __future__ import unicode_literals
+import json
 import random
 import string
-
+from django.utils.importlib import import_module
 
 class Params(dict):
-    pass
+    def dumps(self):
+        data = {}
+        for name, value in self.items():
+            data[name] = {
+                'module': value.__class__.__module__,
+                'class': value.__class__.__name__}
+            data[name].update(value.as_dict())
+        return json.dumps(data)
+
+    @staticmethod
+    def loads(s):
+        data = json.loads(s)
+        params = Params()
+        for name, value in data.items():
+            module = value.pop('module')
+            klass = value.pop('class')
+            params[name] = getattr(import_module(module), klass)(**value)
+        return params
 
 
 class ParamValue(object):
@@ -13,6 +31,13 @@ class ParamValue(object):
 
     def __unicode__(self):
         pass
+
+    def as_dict(self):
+        return dict((k,v) for k,v in self.__dict__.items() if not k.startswith('_'))
+
+    @staticmethod
+    def from_dict(self, params):
+        return self.__init__(**params)
 
 
 class PlainValue(ParamValue):
@@ -24,9 +49,6 @@ class PlainValue(ParamValue):
 
     def __unicode__(self):
         return self.value
-
-    def __iter__(self):
-        return
 
 
 class RandomValue(ParamValue):
