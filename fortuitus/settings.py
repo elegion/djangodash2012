@@ -115,9 +115,11 @@ INSTALLED_APPS = (
     'south',
     'compressor',
     'djcelery',
+    'kombu.transport.django',
 
     'fortuitus.fcore',
     'fortuitus.feditor',
+    'fortuitus.frunner',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -149,6 +151,8 @@ LOGGING = {
     }
 }
 
+TEST_RUNNER = 'djcelery.contrib.test_runner.CeleryTestSuiteRunner'
+
 # Django-compressor settings
 COMPRESS_OFFLINE = True
 COMPRESS_CSS_FILTERS = (
@@ -161,7 +165,6 @@ COMPRESS_JS_FILTERS = ('compressor.filters.jsmin.SlimItFilter',)
 # Celery settings
 import djcelery
 djcelery.setup_loader()
-
 BROKER_URL = 'django://'
 
 

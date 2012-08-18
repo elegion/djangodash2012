@@ -1,16 +1,11 @@
-"""
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
-
-Replace this with more appropriate tests for your application.
-"""
-
 from django.test import TestCase
 
 
-class SimpleTest(TestCase):
-    def test_basic_addition(self):
+class TaskTestCase(TestCase):
+    def test_add(self):
         """
-        Tests that 1 + 1 always equals 2.
+        Tests that 1 + 1 always equals 2. Asynchronously!
         """
-        self.assertEqual(1 + 1, 2)
+        from fortuitus.frunner.tasks import add
+        result = add.delay(1, 1)
+        self.assertEqual(result.result, 2)
