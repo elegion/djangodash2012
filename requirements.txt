@@ -5,6 +5,7 @@ factory_boy==1.2.0
 
 south==0.7.6
 django-autoslug==1.5.0
+unidecode
 django-jsonfield==0.8.11
 
 django-compressor==1.2

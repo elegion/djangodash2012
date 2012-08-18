@@ -42,7 +42,7 @@ class TestCase(models_base.TestCase):
      * Check last tweet is the one that was posted in step 1.
 
     """
-    project = models.ForeignKey(TestProject)
+    project = models.ForeignKey(TestProject, related_name='testcases')
 
     def __unicode__(self):
         return self.name

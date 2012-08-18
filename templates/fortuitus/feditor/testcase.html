@@ -1,0 +1,24 @@
+{% extends 'site_base.html' %}
+{% block content %}
+    <header class="subhead" id="overview">
+        <h1>TestCase: {{ testcase.name }}</h1>
+    </header>
+
+    <ol class="teststeps">
+        {% for step in testcase.steps.all %}
+            <li><span>
+                <span class="method">{{ step.get_method_display }}</span> {{ step.url }}
+                <ul class="params">
+                {% for name, value in step.params.items %}
+                    <li>{{ name }} = {{ value }}</li>
+                {% endfor %}
+                </ul>
+            </span></li>
+        {% endfor %}
+    </ol>
+
+    <p>
+    <button class="add-test btn">Add Query</button>
+    <button class="add-test btn">Add Assert</button>
+    </p>
+{% endblock %}

@@ -167,6 +167,9 @@ import djcelery
 djcelery.setup_loader()
 BROKER_URL = 'django://'
 
+from unidecode import unidecode
+AUTOSLUG_SLUGIFY_FUNCTION = lambda s: unidecode(s.lower()).replace(' ', '-').replace('_', '-')
+
 
 try:
     from settings_local import *

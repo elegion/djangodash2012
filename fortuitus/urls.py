@@ -5,8 +5,9 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    url(r'', include('fortuitus.fcore.urls')),
-
-#    url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^admin/', include(admin.site.urls)),
+    url(r'', include('fortuitus.fcore.urls')),
+    url(r'', include('fortuitus.feditor.urls')),
+#    url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
+
 )

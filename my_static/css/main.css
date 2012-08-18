@@ -1,0 +1,45 @@
+.footer {
+    border-top: 1px solid #999;
+    padding: 1em 2em;
+    margin: 1em 0 0 0;
+}
+
+h2 {
+    margin: 1em 0 0.5em 0;
+}
+
+.add-test {
+    margin: 0 0 0 0.5em;
+}
+
+.testcases {
+    margin: 0 0.5em;
+    font-size: 18px;
+}
+    .testcases li {
+        list-style: none;
+        margin: 1em 0;
+    }
+
+.teststeps {
+    margin-top: 1.5em;
+}
+    .teststeps li {
+        font-size: 18px; /*@baseFontSize * 1.4 */
+        margin-top: 1em;
+    }
+    .teststeps li .method {
+        color: #999;
+    }
+    .teststeps li span {
+        font-size: 15px; /*@baseFontSize * 1.2 */
+        vertical-align: top;
+    }
+        .teststeps li .params {
+            list-style: none;
+            margin-top: 0.7em;
+        }
+            .teststeps li .params li {
+                font-size: 13px; /*@baseFontSize*/
+                margin-top: 0.5em;
+            }

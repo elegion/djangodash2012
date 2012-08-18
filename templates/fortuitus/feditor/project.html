@@ -1,0 +1,20 @@
+{% extends 'site_base.html' %}
+{% block content %}
+    <header class="subhead" id="overview">
+    <h1>Project: {{ project.name }}</h1>
+    </header>
+
+    <h2>Tests</h2>
+
+
+    <ul class="testcases">
+    {% for tc in project.testcases.all %}
+        <li>
+            <a href="{% url feditor_testcase company=project.company.slug project=project.slug test=tc.slug %}">
+            {{ tc.name }}
+        </a></li>
+    {% endfor %}
+    </ul>
+
+    <button class="add-test btn btn-primary">Add Test</button>
+{% endblock %}
