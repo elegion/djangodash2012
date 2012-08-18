@@ -5,10 +5,12 @@ from fortuitus.fcore.models import Company, FortuitusProfile
 
 
 class FortuitusProfileInline(admin.StackedInline):
+    """ Users profile admin inline. """
     model = FortuitusProfile
 
 
 class UserAdmin(UserAdmin):
+    """ Users administration. """
     inlines = [FortuitusProfileInline]
 
 

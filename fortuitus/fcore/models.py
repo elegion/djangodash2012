@@ -5,6 +5,7 @@ from django.db import models
 
 
 class Company(models.Model):
+    """ Organization. """
     slug = AutoSlugField(populate_from='name')
     name = models.CharField(max_length=100)
 
@@ -13,11 +14,14 @@ class Company(models.Model):
 
 
 class FortuitusProfile(models.Model):
+    """ User profile. """
     user = models.OneToOneField(User)
+    # TODO: support multiple organizations.
     company = models.ForeignKey(Company, null=True, blank=True)
 
 
 def create_user_profile(sender, instance, created, **kwargs):
+    """ User post_save signal handler, creates user profile instance. """
     if created:
         FortuitusProfile.objects.create(user=instance)
 
