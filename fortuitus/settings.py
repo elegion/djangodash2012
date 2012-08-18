@@ -119,6 +119,7 @@ INSTALLED_APPS = (
 
     'fortuitus.fcore',
     'fortuitus.feditor',
+    'fortuitus.frunner',
 )
 
 # A sample logging configuration. The only tangible logging
