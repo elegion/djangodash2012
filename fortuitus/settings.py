@@ -151,8 +151,9 @@ LOGGING = {
 # Django-compressor settings
 COMPRESS_OFFLINE = True
 COMPRESS_CSS_FILTERS = (
+    'compressor.filters.css_default.CssAbsoluteFilter',
     'compressor.filters.cssmin.CSSMinFilter',
-    'compressor.filters.datauri.CssDataUriFilter',
+#    'compressor.filters.datauri.CssDataUriFilter',
 )
 COMPRESS_JS_FILTERS = ('compressor.filters.jsmin.SlimItFilter',)
 
