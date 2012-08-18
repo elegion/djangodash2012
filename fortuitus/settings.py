@@ -74,6 +74,7 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    'compressor.finders.CompressorFinder',
 )
 
 # Make this unique, and don't share it with anybody.
@@ -112,6 +113,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
 #    'django.contrib.admindocs',
     'south',
+    'compressor',
 
     'fortuitus.fcore',
     'fortuitus.feditor',
@@ -146,6 +148,13 @@ LOGGING = {
     }
 }
 
+# Django-compressor settings
+COMPRESS_OFFLINE = True
+COMPRESS_CSS_FILTERS = (
+    'compressor.filters.cssmin.CSSMinFilter',
+    'compressor.filters.datauri.CssDataUriFilter',
+)
+COMPRESS_JS_FILTERS = ('compressor.filters.jsmin.SlimItFilter',)
 
 try:
     from settings_local import *
