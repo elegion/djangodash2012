@@ -26,7 +26,7 @@ class TestProject(models.Model):
     name = models.CharField(max_length=100)
 
     base_url = models.URLField()
-    common_params = ParamsField()
+    common_params = ParamsField(blank=True, null=True)
 
     class Meta:
         abstract = True
@@ -71,7 +71,7 @@ class TestCaseStep(models.Model):
     url = models.CharField(max_length=255)
     method = models.CharField(max_length=10, choices=method_choices,
         blank=True, null=True)
-    params = ParamsField()
+    params = ParamsField(blank=True, null=True)
 
     class Meta:
         abstract = True

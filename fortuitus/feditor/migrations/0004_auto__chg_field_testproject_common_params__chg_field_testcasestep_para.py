@@ -12,10 +12,16 @@ class Migration(SchemaMigration):
         # Changing field 'TestProject.common_params'
         db.alter_column('feditor_testproject', 'common_params', self.gf('fortuitus.feditor.dbfields.ParamsField')(null=True))
 
+        # Changing field 'TestCaseStep.params'
+        db.alter_column('feditor_testcasestep', 'params', self.gf('fortuitus.feditor.dbfields.ParamsField')(null=True))
+
     def backwards(self, orm):
 
         # User chose to not deal with backwards NULL issues for 'TestProject.common_params'
         raise RuntimeError("Cannot reverse this migration. 'TestProject.common_params' and its values cannot be restored.")
+
+        # User chose to not deal with backwards NULL issues for 'TestCaseStep.params'
+        raise RuntimeError("Cannot reverse this migration. 'TestCaseStep.params' and its values cannot be restored.")
 
     models = {
         'fcore.company': {
@@ -47,7 +53,7 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'method': ('django.db.models.fields.CharField', [], {'max_length': '10', 'null': 'True', 'blank': 'True'}),
             'order': ('django.db.models.fields.PositiveSmallIntegerField', [], {}),
-            'params': ('fortuitus.feditor.dbfields.ParamsField', [], {}),
+            'params': ('fortuitus.feditor.dbfields.ParamsField', [], {'null': 'True', 'blank': 'True'}),
             'testcase': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['feditor.TestCase']"}),
             'url': ('django.db.models.fields.CharField', [], {'max_length': '255'})
         },
