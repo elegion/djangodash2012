@@ -12,6 +12,9 @@ class TestProject(models.Model):
 
     base_url = models.URLField()
 
+    def __unicode__(self):
+        return u'%s (%s)' % (self.name, self.base_url)
+
 
 class Params(models.Model):
     pass
@@ -22,6 +25,9 @@ class TestCase(models.Model):
 
     slug = AutoSlugField(populate_from='name')
     name = models.CharField(max_length=100)
+
+    def __unicode__(self):
+        return self.name
 
 
 class TestCaseStep(models.Model):

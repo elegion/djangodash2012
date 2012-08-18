@@ -8,11 +8,14 @@ class Company(models.Model):
     slug = AutoSlugField(populate_from='name')
     name = models.CharField(max_length=100)
 
+    def __unicode__(self):
+        return self.name
+
 
 class FortuitusProfile(models.Model):
     user = models.OneToOneField(User)
 
-    company = models.ForeignKey(Company)
+    company = models.ForeignKey(Company, null=True, blank=True)
 
 
 def create_user_profile(sender, instance, created, **kwargs):

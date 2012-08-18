@@ -5,8 +5,7 @@ from fortuitus.fcore.models import Company, FortuitusProfile
 
 
 class FortuitusProfileInline(admin.StackedInline):
-    class Meta:
-        model = FortuitusProfile
+    model = FortuitusProfile
 
 
 class UserAdmin(UserAdmin):
@@ -15,3 +14,4 @@ class UserAdmin(UserAdmin):
 
 admin.site.register(Company)
 admin.site.unregister(User)
+admin.site.register(User, UserAdmin)
