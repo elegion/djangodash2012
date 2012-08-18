@@ -2,7 +2,9 @@ import string
 
 from django.test import TestCase
 
+from fortuitus.fcore.models import Company
 from fortuitus.feditor.dbfields import ParamsField
+from fortuitus.feditor.models import TestProject
 from fortuitus.feditor.params import Params, PlainValue, RandomValue
 
 
@@ -42,8 +44,7 @@ class ParamsTestCase(TestCase):
 
         login = unicode(param['login'])
         self.assertEquals(len(login), 5)
-        for char in login:
-            self.assertTrue(char in symbols)
+        self.assertTrue(all(c in symbols for c in login))
 
         new_login = unicode(param['login'])
         self.assertEquals(login, new_login)
@@ -53,3 +54,20 @@ class ParamsTestCase(TestCase):
             param['login'] = RandomValue(length=length, symbols=symbols)
             new_login = unicode(param['login'])
             self.assertNotEquals(login, new_login)
+
+
+class ParamsFieldTestCase(TestCase):
+    def test_inmodel(self):
+        length = 7
+        symbols = string.ascii_letters
+
+        company = Company.objects.create(name='test')
+        proj = TestProject(name='test', company=company,
+            base_url='http://example.com', common_params=Params())
+        proj.common_params['login'] = RandomValue(length, symbols)
+        proj.save()
+
+        proj2 = TestProject.objects.get(pk=proj.pk)
+        login = unicode(proj2.common_params['login'])
+        self.assertEquals(len(login), length)
+        self.assertTrue(all(c in symbols for c in login))
