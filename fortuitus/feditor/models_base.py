@@ -5,14 +5,16 @@ from fortuitus.feditor.dbfields import ParamsField
 
 
 class Method:
-    GET = 'get'
-    POST = 'post'
+    OPTIONS = 'OPTIONS'
+    HEAD = 'HEAD'
+    GET = 'GET'
+    POST = 'POST'
+    PUT = 'PUT'
+    DELETE = 'DELETE'
+    PATCH = 'PATCH'
 
 
-method_choices = (
-    (Method.GET, 'get'),
-    (Method.POST, 'post'),
-    )
+method_choices = [(f, f) for f in dir(Method) if not f.startswith('_')]
 
 
 class TestProject(models.Model):
@@ -70,7 +72,7 @@ class TestCaseStep(models.Model):
 
     url = models.CharField(max_length=255)
     method = models.CharField(max_length=10, choices=method_choices,
-        blank=True, null=True)
+                              blank=True, null=True)
     params = ParamsField(blank=True, null=True)
 
     class Meta:
