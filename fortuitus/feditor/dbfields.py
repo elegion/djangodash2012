@@ -1,13 +1,19 @@
-import json
+from __future__ import unicode_literals
+
 from django.db import models
-from fortuitus.feditor.params import Params
 from south.modelsinspector import add_introspection_rules
+
+from fortuitus.feditor.params import Params
 
 
 class ParamsField(models.TextField):
+    """
+    Serialized query parameters to store them in the database.
+
+    """
     __metaclass__ = models.SubfieldBase
 
-    description = u'Store query Params, like GET params: login=test, password=test'
+    description = 'Stores query params. E.g. GET params: login=test&password=test'
 
     def to_python(self, value):
         if isinstance(value, Params):

@@ -10,6 +10,7 @@ from fortuitus.feditor.params import Params, PlainValue, RandomValue
 
 class ParamsTestCase(TestCase):
     def test_serialize(self):
+        """ Tests params serialization. """
         length = 6
         symbols = string.digits
         login = 'test_login'
@@ -29,6 +30,7 @@ class ParamsTestCase(TestCase):
         self.assertNotEquals(password2, password)
 
     def test_plain(self):
+        """ Tests PlainValue. """
         param = Params()
         param['login'] = PlainValue('test_login')
         param['password'] = PlainValue('test_password')
@@ -36,6 +38,7 @@ class ParamsTestCase(TestCase):
         self.assertEquals(unicode(param['password']), 'test_password')
 
     def test_random(self):
+        """ Tests RandomValue. """
         length = 5
         symbols = string.ascii_letters
 
@@ -58,6 +61,7 @@ class ParamsTestCase(TestCase):
 
 class ParamsFieldTestCase(TestCase):
     def test_inmodel(self):
+        """ Tests params field. """
         login = 'test_login'
         length = 7
         symbols = string.ascii_letters
