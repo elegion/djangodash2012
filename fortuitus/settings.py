@@ -151,6 +151,8 @@ LOGGING = {
     }
 }
 
+TEST_RUNNER = 'djcelery.contrib.test_runner.CeleryTestSuiteRunner'
+
 # Django-compressor settings
 COMPRESS_OFFLINE = True
 COMPRESS_CSS_FILTERS = (
@@ -163,7 +165,6 @@ COMPRESS_JS_FILTERS = ('compressor.filters.jsmin.SlimItFilter',)
 # Celery settings
 import djcelery
 djcelery.setup_loader()
-
 BROKER_URL = 'django://'
 
 
