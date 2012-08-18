@@ -1,3 +1,4 @@
+from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.utils import timezone
 import mock
@@ -220,3 +221,31 @@ class OperatorsTestCase(TestCase):
         self.assertTrue(eq.run())
         eq = Eq(1, 2)
         self.assertFalse(eq.run())
+
+
+class RunnerViewsTestCase(TestCase):
+    def test_projects(self):
+        """ Tests project list page is rendered properly. """
+        response = self.client.get(reverse('frunner_projects'))
+        self.assertEqual(200, response.status_code)
+        self.assertTemplateUsed('fortuitus/frunner/projects.html')
+
+    def test_project_runs(self):
+        """ Tests project list page is rendered properly. """
+        project = efactories.TestProjectF.create()
+        url = reverse('frunner_project_runs',
+                      kwargs={'project_id': project.id})
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        self.assertTemplateUsed('fortuitus/frunner/project_runs.html')
+
+    def test_test_case(self):
+        """ Tests project list page is rendered properly. """
+        project = efactories.TestProjectF.create()
+        case = rfactories.TestCaseF.create()
+        url = reverse('frunner_test_case',
+                      kwargs={'project_id': project.pk,
+                              'test_case_id': case.pk})
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        self.assertTemplateUsed('fortuitus/frunner/test_case.html')
