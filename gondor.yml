@@ -6,3 +6,7 @@ wsgi:
     entry_point: fortuitus.wsgi:application
 django:
     manage.py: manage.py
+on_deploy:
+    - manage.py collectstatic --noinput
+    - manage.py syncdb --noinput
+    - manage.py migrate --noinput
