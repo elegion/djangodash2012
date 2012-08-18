@@ -1,0 +1,19 @@
+<h2 class="testcase-header">{{ testcase.name }} <small>{% if testcase.need_login %}needs login{% endif %}</small></h2>
+
+<ol class="teststeps">
+    {% for step in testcase.steps.all %}
+        <li><span>
+            <span class="method">{{ step.get_method_display }}</span> {{ step.url }}
+            <ul class="params">
+            {% for name, value in step.params.items %}
+                <li>{{ name }} = {{ value }}</li>
+            {% endfor %}
+            </ul>
+        </span></li>
+    {% endfor %}
+</ol>
+
+<p>
+<button class="add-test btn">Add Query</button>
+<button class="add-test btn">Add Assert</button>
+</p>

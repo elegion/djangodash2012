@@ -1,12 +1,25 @@
+.content {
+    padding-bottom: 80px; /*footer*/
+}
 .footer {
+    position:absolute;
+    bottom:0;
+    left: 0;
+    right: 0;
+    height: 25px;
     border-top: 1px solid #999;
     padding: 1em 2em;
     margin: 1em 0 0 0;
 }
 
-h2 {
-    margin: 1em 0 0.5em 0;
+.sidebar {
+    border-right: 1px solid #EEE;
 }
+h2 {
+}
+    h2 small {
+        display: block;
+    }
 
 .add-test {
     margin: 0 0 0 0.5em;
@@ -19,6 +32,9 @@ h2 {
     .testcases li {
         list-style: none;
         margin: 1em 0;
+    }
+    .testcases li.active a {
+        color: #000;
     }
 
 .teststeps {
@@ -43,3 +59,7 @@ h2 {
                 font-size: 13px; /*@baseFontSize*/
                 margin-top: 0.5em;
             }
+
+.testcase-info-form {
+    display: none;
+}

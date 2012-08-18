@@ -1,0 +1,6 @@
+<form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="project" value="{{ project.pk }}">
+    <input type="hidden" name="action" value="add_testcase">
+    <button class="add-test btn btn-primary">Add Test</button>
+</form>

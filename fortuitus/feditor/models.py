@@ -35,6 +35,16 @@ class Params(models_base.Params):
     pass
 
 
+class TestCaseManager(models.Manager):
+    new_name = 'New Test'
+    def get_unique_new_name(self):
+        names = self.filter(name__istartswith=self.new_name).values_list('name', flat=True)
+        idx = 1
+        while '%s %d' % (self.new_name, idx) in names:
+            idx += 1
+        return '%s %d' % (self.new_name, idx)
+
+
 class TestCase(models_base.TestCase):
     """
     Test case.
@@ -52,6 +62,8 @@ class TestCase(models_base.TestCase):
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+
+    objects = TestCaseManager()
 
     class Meta():
         ordering = ('created',)

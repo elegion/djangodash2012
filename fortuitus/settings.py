@@ -116,6 +116,7 @@ INSTALLED_APPS = (
     'compressor',
     'djcelery',
     'kombu.transport.django',
+    'bootstrapform',
 
     'fortuitus.fcore',
     'fortuitus.feditor',
