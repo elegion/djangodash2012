@@ -31,7 +31,8 @@ class TestCase(models_base.TestCase):
 
     start_date = models.DateTimeField(null=True, blank=True)
     end_date = models.DateTimeField(null=True, blank=True)
-    result = models.CharField(max_length=10, choices=TEST_CASE_RESULT_CHOICES, blank=False, null=True)
+    result = models.CharField(max_length=10, choices=TEST_CASE_RESULT_CHOICES,
+                              blank=False, null=True)
 
     def run(self):
         self.start_date = timezone.now()
@@ -67,7 +68,8 @@ class TestCaseStep(models_base.TestCaseStep):
 
     start_date = models.DateTimeField(null=True, blank=True)
     end_date = models.DateTimeField(null=True, blank=True)
-    result = models.CharField(max_length=10, choices=TEST_CASE_RESULT_CHOICES, blank=False, null=True)
+    result = models.CharField(max_length=10, choices=TEST_CASE_RESULT_CHOICES,
+                              blank=False, null=True)
 
     response_code = models.PositiveSmallIntegerField(null=True, blank=True)
     response_headers = JSONField(null=True, blank=True)
@@ -93,7 +95,8 @@ class TestCaseAssert(models_base.TestCaseAssert):
     """
     step = models.ForeignKey(TestCaseStep, related_name='assertions')
 
-    result = models.CharField(max_length=10, choices=TEST_CASE_RESULT_CHOICES, blank=False, null=True)
+    result = models.CharField(max_length=10, choices=TEST_CASE_RESULT_CHOICES,
+                              blank=False, null=True)
 
     def do_assertion(self, responses):
         pass
