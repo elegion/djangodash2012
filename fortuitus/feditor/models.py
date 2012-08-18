@@ -86,7 +86,7 @@ class TestCaseAssert(models.Model):
 
     Contains assertions for a test case step.
     """
-    testcase = models.ForeignKey(TestCase)
+    step = models.ForeignKey(TestCaseStep)
     order = models.PositiveSmallIntegerField()
 
     expression = models.CharField(max_length=255)
