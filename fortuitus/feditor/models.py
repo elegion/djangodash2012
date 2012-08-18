@@ -20,6 +20,12 @@ class TestProject(models.Model):
     base_url = models.URLField()
     common_params = ParamsField(blank=True, null=True)
 
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    class Meta():
+        ordering = ('slug',)
+
     def __unicode__(self):
         return u'%s (%s)' % (self.name, self.base_url)
 
@@ -43,6 +49,12 @@ class TestCase(models_base.TestCase):
 
     """
     project = models.ForeignKey(TestProject, related_name='testcases')
+
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    class Meta():
+        ordering = ('created',)
 
     def __unicode__(self):
         return self.name
