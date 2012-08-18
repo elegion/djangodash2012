@@ -114,6 +114,7 @@ INSTALLED_APPS = (
 #    'django.contrib.admindocs',
     'south',
     'compressor',
+    'djcelery',
 
     'fortuitus.fcore',
     'fortuitus.feditor',
@@ -156,6 +157,13 @@ COMPRESS_CSS_FILTERS = (
 #    'compressor.filters.datauri.CssDataUriFilter',
 )
 COMPRESS_JS_FILTERS = ('compressor.filters.jsmin.SlimItFilter',)
+
+# Celery settings
+import djcelery
+djcelery.setup_loader()
+
+BROKER_URL = 'django://'
+
 
 try:
     from settings_local import *
