@@ -115,6 +115,7 @@ INSTALLED_APPS = (
     'south',
     'compressor',
     'djcelery',
+    'djcelery.transport',
 
     'fortuitus.fcore',
     'fortuitus.feditor',
