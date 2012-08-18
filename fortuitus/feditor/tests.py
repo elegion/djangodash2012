@@ -1,7 +1,10 @@
 import string
+
 from django.test import TestCase
+
 from fortuitus.feditor.dbfields import ParamsField
 from fortuitus.feditor.params import Params, PlainValue, RandomValue
+
 
 class ParamsTestCase(TestCase):
     def test_plain(self):
@@ -26,7 +29,7 @@ class ParamsTestCase(TestCase):
         new_login = unicode(param['login'])
         self.assertEquals(login, new_login)
 
-        #random should be different at least 10 times
+        # Random should be different at least 10 times.
         for x in xrange(10):
             param['login'] = RandomValue(length=length, symbols=symbols)
             new_login = unicode(param['login'])
