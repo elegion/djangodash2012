@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 from jsonfield import JSONField
 import requests
 
@@ -33,9 +34,22 @@ class TestCase(models_base.TestCase):
     result = models.CharField(max_length=10, choices=TEST_CASE_RESULT_CHOICES, blank=False, null=True)
 
     def run(self):
+        self.start_date = timezone.now()
+
         responses = []
-        for step in self.steps:
-            step.run(responses)
+        for step in self.steps.all():
+            try:
+                if not step.run(responses):
+                    break
+            except:
+                self.result = TestResult.error
+                break
+        else:
+            self.result = TestResult.success
+
+        self.result = self.result or TestResult.fail
+        self.end_date = timezone.now()
+        self.save()
 
 
 class Params(models_base.Params):

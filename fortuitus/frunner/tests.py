@@ -1,11 +1,13 @@
-from django.test import TestCase
+from django.utils import timezone
 import mock
-from fortuitus.feditor import models as emodels
-from fortuitus.frunner import factories, models as rmodels
+
+from core.tests import BaseTestCase
+from fortuitus.feditor import factories as efactories, models as emodels
+from fortuitus.frunner import factories as rfactories, models as rmodels
 from fortuitus.frunner.tasks import run_tests
 
 
-class TaskTestCase(TestCase):
+class TaskTestCase(BaseTestCase):
     def test_add(self):
         """
         Tests that 1 + 1 always equals 2. Asynchronously!
@@ -15,20 +17,25 @@ class TaskTestCase(TestCase):
         self.assertEqual(result.result, 2)
 
 
-class RunTestsTaskTestCase(TestCase):
+class RunTestsTaskTestCase(BaseTestCase):
     def test_non_existing_test(self):
+        """ Should raise emodels.TestCase.DoesNotExist if test case not found
+        """
         with self.assertRaises(emodels.TestCase.DoesNotExist):
             run_tests(10000)
 
     @mock.patch('fortuitus.frunner.models.TestCase.run', mock.Mock())
     def test_copies_and_runs_testcase(self):
-        test_case = factories.TestCaseF.create()
-        step1 = factories.TestCaseStepF.create(testcase=test_case)
-        step2 = factories.TestCaseStepF.create(testcase=test_case)
-        assertion_2_1 = factories.TestCaseAssertF.create(step=step2)
-        step3 = factories.TestCaseStepF.create(testcase=test_case)
-        assertion_3_1 = factories.TestCaseAssertF.create(step=step3)
-        assertion_3_2 = factories.TestCaseAssertF.create(step=step3)
+        """ Should copy TestCase (and all related models) int frunner.models.TestCase
+        then perform frunner.models.TestCase.run()
+        """
+        test_case = efactories.TestCaseF.create()
+        step1 = efactories.TestCaseStepF.create(testcase=test_case)
+        step2 = efactories.TestCaseStepF.create(testcase=test_case)
+        assertion_2_1 = efactories.TestCaseAssertF.create(step=step2)
+        step3 = efactories.TestCaseStepF.create(testcase=test_case)
+        assertion_3_1 = efactories.TestCaseAssertF.create(step=step3)
+        assertion_3_2 = efactories.TestCaseAssertF.create(step=step3)
 
         run_tests(test_case.pk)
 
@@ -61,9 +68,75 @@ class RunTestsTaskTestCase(TestCase):
         self.assertEqual(assertion_2_1.operator, assertion_2_1_copy.operator)
 
 
-class TestCaseModelTestCase(TestCase):
-    def test_run_runs_all_responses(self):
-        pass
+class TestCaseModelTestCase(BaseTestCase):
+    @mock.patch('fortuitus.frunner.models.TestCaseStep.run', mock.Mock(return_value=True))
+    def test_run_runs_all_test_steps(self):
+        """ Test case should run all TestCaseSteps and mark self as success
+        """
+        start = timezone.now()
+
+        test_case = rfactories.TestCaseF.create()
+        rfactories.TestCaseStepF.create(testcase=test_case)
+        rfactories.TestCaseStepF.create(testcase=test_case)
+
+        test_case.run()
+
+        rmodels.TestCaseStep.run.assert_called_twice_with([])
+
+        self.assertObjectUpdated(test_case,
+            start_date__gte=start,
+            end_date__gte=start,
+            result=rmodels.TestResult.success)
+
+    @mock.patch('fortuitus.frunner.models.TestCaseStep.run', mock.Mock(return_value=True))
+    def test_run_without_test_steps(self):
+        """ Test case should be runnable without TestCaseSteps (and should be success)
+        """
+        start = timezone.now()
+        test_case = rfactories.TestCaseF.create()
+
+        test_case.run()
+
+        self.assertEqual(0, rmodels.TestCaseStep.run.call_count)
+
+        self.assertObjectUpdated(test_case,
+                                 start_date__gte=start,
+                                 end_date__gte=start,
+                                 result=rmodels.TestResult.success)
+
+    @mock.patch('fortuitus.frunner.models.TestCaseStep.run', mock.Mock(return_value=False))
+    def test_marked_failed(self):
+        """ Test case should be marked as failed if TestCaseStep.run returns False
+        """
+        start = timezone.now()
+        test_case = rfactories.TestCaseF.create()
+        rfactories.TestCaseStepF.create(testcase=test_case)
+        rfactories.TestCaseStepF.create(testcase=test_case)
+
+        test_case.run()
+
+        self.assertEqual(1, rmodels.TestCaseStep.run.call_count)
+
+        self.assertObjectUpdated(test_case,
+                                 start_date__gte=start,
+                                 end_date__gte=start,
+                                 result=rmodels.TestResult.fail)
 
     def test_run_saves_exceptions(self):
-        pass
+        """ Test case should save exceptions thrown by TestCaseStep.run (and mark self as error)
+        """
+        start = timezone.now()
+        test_case = rfactories.TestCaseF.create()
+        rfactories.TestCaseStepF.create(testcase=test_case)
+        rfactories.TestCaseStepF.create(testcase=test_case)
+
+        def raise_exception(*args, **kwargs):
+            raise Exception('asdf')
+
+        with mock.patch('fortuitus.frunner.models.TestCaseStep.run', raise_exception):
+            test_case.run()
+
+        self.assertObjectUpdated(test_case,
+                                 start_date__gte=start,
+                                 end_date__gte=start,
+                                 result=rmodels.TestResult.error)

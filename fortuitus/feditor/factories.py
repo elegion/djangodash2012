@@ -1,7 +1,16 @@
 import factory
-from fortuitus.feditor.factories import TestProjectF
+from fortuitus.fcore.factories import CompanyF
 
-from fortuitus.frunner import models
+from fortuitus.feditor import models
+
+
+class TestProjectF(factory.Factory):
+    FACTORY_FOR = models.TestProject
+
+    company = factory.LazyAttribute(lambda o: CompanyF.create())
+    name = factory.Sequence(lambda n: 'TestProject #%s' % n)
+
+    base_url = 'http://api.example.com/'
 
 
 class TestCaseF(factory.Factory):
