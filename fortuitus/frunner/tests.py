@@ -56,4 +56,14 @@ class RunTestsTaskTestCase(TestCase):
 
         assertion_2_1_copy = step2_copy.assertions.all()[0]
         self.assertEqual(assertion_2_1.order, assertion_2_1_copy.order)
-        self.assertEqual(assertion_2_1.expression, assertion_2_1_copy.expression)
+        self.assertEqual(assertion_2_1.lhs, assertion_2_1_copy.lhs)
+        self.assertEqual(assertion_2_1.rhs, assertion_2_1_copy.rhs)
+        self.assertEqual(assertion_2_1.operator, assertion_2_1_copy.operator)
+
+
+class TestCaseModelTestCase(TestCase):
+    def test_run_runs_all_responses(self):
+        pass
+
+    def test_run_saves_exceptions(self):
+        pass

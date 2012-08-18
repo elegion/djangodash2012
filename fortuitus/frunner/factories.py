@@ -31,4 +31,6 @@ class TestCaseAssertF(factory.Factory):
     FACTORY_FOR = models.TestCaseAssert
 
     order = 1
-    expression = ''
+    lhs = ''
+    rhs = ''
+    operator = models.models_base.method_choices[0][0]
