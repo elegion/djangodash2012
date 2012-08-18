@@ -1,6 +1,5 @@
 # Django settings for fortuitus project.
 import os
-import urlparse
 
 WORKDIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -23,18 +22,6 @@ DATABASES = {
         'PORT': '',
     }
 }
-
-if 'GONDOR_DATABASE_URL' in os.environ:
-    urlparse.uses_netloc.append('postgres')
-    url = urlparse.urlparse(os.environ['GONDOR_DATABASE_URL'])
-    DATABASES['default'] = {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': url.path[1:],
-        'USER': url.username,
-        'PASSWORD': url.password,
-        'HOST': url.hostname,
-        'PORT': url.port
-    }
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -156,6 +143,7 @@ LOGGING = {
         },
     }
 }
+
 
 try:
     from settings_local import *
