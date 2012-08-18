@@ -1,4 +1,11 @@
-<h2 class="testcase-header">{{ testcase.name }} <small>{% if testcase.need_login %}needs login{% endif %}</small></h2>
+<h2 class="testcase-header">
+    {{ testcase.name }} <small>{% if testcase.need_login %}needs login{% endif %}</small>
+    <form class="delete_form" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="delete_testcase">
+        <input type="hidden" name="testcase" value="{{ testcase.pk }}">
+    </form>
+</h2>
 
 <ol class="teststeps">
     {% for step in testcase.steps.all %}
@@ -13,7 +20,7 @@
     {% endfor %}
 </ol>
 
-<p>
+<p class="add-buttons">
 <button class="add-test btn">Add Query</button>
 <button class="add-test btn">Add Assert</button>
 </p>

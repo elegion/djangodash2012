@@ -20,11 +20,16 @@ def project(request, company, project):
     tc_form = TestCaseForm(instance=testcase)
 
     if request.POST:
+        if not can_edit_project(request.user, project):
+            return HttpResponseForbidden()
+
         if request.POST.get('action') == 'add_testcase':
-            if not can_edit_project(request.user, project):
-                return HttpResponseForbidden()
             tc = TestCase.objects.create(name=TestCase.objects.get_unique_new_name(), project=project)
             return redirect(request.path + '?testcase=%s' % tc.slug)
+
+        if request.POST.get('action') == 'delete_testcase':
+            TestCase.objects.filter(pk=request.POST.get('testcase')).delete()
+            return redirect(request.path)
 
         tc_form = TestCaseForm(request.POST, instance=testcase)
         if tc_form.is_valid():

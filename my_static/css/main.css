@@ -27,7 +27,7 @@ h2 {
 
 .testcases {
     margin: 0 0.5em;
-    font-size: 18px;
+    font-size: 16px;
 }
     .testcases li {
         list-style: none;
@@ -62,4 +62,12 @@ h2 {
 
 .testcase-info-form {
     display: none;
+}
+
+.add-buttons {
+    margin: 3em 0 0 0;
+}
+
+.btn-delete-testcase {
+    margin: 0 0 0 0.7em;
 }
