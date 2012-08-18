@@ -1,5 +1,5 @@
 *.log
 *.pot
 *.pyc
-local_settings.py
+settings_local.py
 /static/
