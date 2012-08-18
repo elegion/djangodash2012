@@ -1,4 +1,5 @@
 from django.contrib import admin
+
 from fortuitus.feditor.models import TestProject, TestCase
 from fortuitus.feditor.models import TestCaseAssert, TestCaseStep
 

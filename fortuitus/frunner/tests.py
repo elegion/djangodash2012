@@ -1,3 +1,4 @@
+from django.test import TestCase
 from django.utils import timezone
 import mock
 
@@ -26,8 +27,9 @@ class RunTestsTaskTestCase(BaseTestCase):
 
     @mock.patch('fortuitus.frunner.models.TestCase.run', mock.Mock())
     def test_copies_and_runs_testcase(self):
-        """ Should copy TestCase (and all related models) int frunner.models.TestCase
-        then perform frunner.models.TestCase.run()
+        """
+        Should copy TestCase (and all related models) int
+        frunner.models.TestCase then perform frunner.models.TestCase.run()
         """
         test_case = efactories.TestCaseF.create()
         step1 = efactories.TestCaseStepF.create(testcase=test_case)
@@ -71,7 +73,8 @@ class RunTestsTaskTestCase(BaseTestCase):
 class TestCaseModelTestCase(BaseTestCase):
     @mock.patch('fortuitus.frunner.models.TestCaseStep.run', mock.Mock(return_value=True))
     def test_run_runs_all_test_steps(self):
-        """ Test case should run all TestCaseSteps and mark self as success
+        """
+        Test case should run all TestCaseSteps and mark self as success.
         """
         start = timezone.now()
 
@@ -90,7 +93,9 @@ class TestCaseModelTestCase(BaseTestCase):
 
     @mock.patch('fortuitus.frunner.models.TestCaseStep.run', mock.Mock(return_value=True))
     def test_run_without_test_steps(self):
-        """ Test case should be runnable without TestCaseSteps (and should be success)
+        """
+        Test case should be runnable without TestCaseSteps (and should be
+        success).
         """
         start = timezone.now()
         test_case = rfactories.TestCaseF.create()
@@ -106,7 +111,8 @@ class TestCaseModelTestCase(BaseTestCase):
 
     @mock.patch('fortuitus.frunner.models.TestCaseStep.run', mock.Mock(return_value=False))
     def test_marked_failed(self):
-        """ Test case should be marked as failed if TestCaseStep.run returns False
+        """
+        Test case should be marked as failed if TestCaseStep.run returns False.
         """
         start = timezone.now()
         test_case = rfactories.TestCaseF.create()
@@ -123,7 +129,9 @@ class TestCaseModelTestCase(BaseTestCase):
                                  result=rmodels.TestResult.fail)
 
     def test_run_saves_exceptions(self):
-        """ Test case should save exceptions thrown by TestCaseStep.run (and mark self as error)
+        """
+        Test case should save exceptions thrown by TestCaseStep.run
+        (and mark self as error).
         """
         start = timezone.now()
         test_case = rfactories.TestCaseF.create()
@@ -140,3 +148,75 @@ class TestCaseModelTestCase(BaseTestCase):
                                  start_date__gte=start,
                                  end_date__gte=start,
                                  result=rmodels.TestResult.error)
+
+
+class TestCaseAssertTestCase(TestCase):
+    def test_do_assertion(self):
+        responses = [{'status_code': '404'}, {'status_code': '200'}]
+        a = rmodels.TestCaseAssert()
+
+        a.lhs = '0.status_code'
+        a.operator = 'Eq'
+        a.rhs = '404'
+        self.assertTrue(a.do_assertion(responses))
+
+        a.lhs = '.status_code'
+        a.operator = 'Eq'
+        a.rhs = '404'
+        self.assertFalse(a.do_assertion(responses))
+
+
+class ResolversTestCase(TestCase):
+    def test_resolve_operator_short_name(self):
+        """ Tests operator resolver with short operator name. """
+        from . import resolvers, operators
+        Op = resolvers.resolve_operator('Eq')
+        self.assertEqual(Op, operators.Eq)
+
+    def test_resolve_operator_full_name(self):
+        """
+        Tests operator resolver with full operator name, including module.
+        """
+        from . import resolvers, operators
+        Op = resolvers.resolve_operator('fortuitus.frunner.operators.Eq')
+        self.assertEqual(Op, operators.Eq)
+
+    def test_resolve_lhs_last_response(self):
+        """ Test lhs resolver: last response, dictionary. """
+        from .resolvers import resolve_lhs
+        responses = [{'status_code': 404}, {'status_code': 200}]
+        self.assertEqual(resolve_lhs('.status_code', responses), 200)
+
+    def test_resolve_lhs_arbitrary_response(self):
+        """ Test lhs resolver: arbitrary response, dictionary. """
+        from .resolvers import resolve_lhs
+        responses = [{'status_code': 404}, {'status_code': 200}]
+        self.assertEqual(resolve_lhs('0.status_code', responses), 404)
+
+    def test_resolve_lhs_object(self):
+        """ Test lhs resolver: arbitrary response, object. """
+        from .resolvers import resolve_lhs
+        responses = [type('TestResp', (), {'status_code': 200})]
+        self.assertEqual(responses[0].status_code, 200)
+        self.assertEqual(resolve_lhs('0.status_code', responses), 200)
+
+    def test_resolve_rhs_plain_value(self):
+        """ Test rhs resolver: plain value. """
+        from .resolvers import resolve_rhs
+        self.assertEqual(resolve_rhs(1, []), 1)
+        self.assertEqual(resolve_rhs('foo', []), 'foo')
+
+    def test_resolve_rhs_reference(self):
+        """ Test rhs resolver: step reference. """
+        from .resolvers import resolve_rhs
+        responses = [{'status_code': 404}, {'status_code': 200}]
+        self.assertEqual(resolve_rhs('1.status_code', responses), 200)
+
+
+class OperatorsTestCase(TestCase):
+    def test_Eq(self):
+        from .operators import Eq
+        eq = Eq(1, 1)
+        self.assertTrue(eq.run())
+        eq = Eq(1, 2)
+        self.assertFalse(eq.run())

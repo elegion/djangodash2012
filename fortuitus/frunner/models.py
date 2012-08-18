@@ -5,6 +5,8 @@ import requests
 
 from fortuitus.feditor import models_base
 from fortuitus.feditor.models import TestProject
+from fortuitus.frunner.resolvers import (resolve_lhs, resolve_rhs,
+                                         resolve_operator)
 
 
 class TestResult:
@@ -31,7 +33,8 @@ class TestCase(models_base.TestCase):
 
     start_date = models.DateTimeField(null=True, blank=True)
     end_date = models.DateTimeField(null=True, blank=True)
-    result = models.CharField(max_length=10, choices=TEST_CASE_RESULT_CHOICES, blank=False, null=True)
+    result = models.CharField(max_length=10, choices=TEST_CASE_RESULT_CHOICES,
+                              blank=False, null=True)
 
     def run(self):
         self.start_date = timezone.now()
@@ -67,7 +70,8 @@ class TestCaseStep(models_base.TestCaseStep):
 
     start_date = models.DateTimeField(null=True, blank=True)
     end_date = models.DateTimeField(null=True, blank=True)
-    result = models.CharField(max_length=10, choices=TEST_CASE_RESULT_CHOICES, blank=False, null=True)
+    result = models.CharField(max_length=10, choices=TEST_CASE_RESULT_CHOICES,
+                              blank=False, null=True)
 
     response_code = models.PositiveSmallIntegerField(null=True, blank=True)
     response_headers = JSONField(null=True, blank=True)
@@ -93,7 +97,11 @@ class TestCaseAssert(models_base.TestCaseAssert):
     """
     step = models.ForeignKey(TestCaseStep, related_name='assertions')
 
-    result = models.CharField(max_length=10, choices=TEST_CASE_RESULT_CHOICES, blank=False, null=True)
+    result = models.CharField(max_length=10, choices=TEST_CASE_RESULT_CHOICES,
+                              blank=False, null=True)
 
     def do_assertion(self, responses):
-        pass
+        lhs = resolve_lhs(self.lhs, responses)
+        rhs = resolve_rhs(self.rhs, responses)
+        operator = resolve_operator(self.operator)(lhs, rhs)
+        return operator.run()
