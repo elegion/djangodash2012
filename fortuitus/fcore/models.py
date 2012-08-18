@@ -14,7 +14,6 @@ class Company(models.Model):
 
 class FortuitusProfile(models.Model):
     user = models.OneToOneField(User)
-
     company = models.ForeignKey(Company, null=True, blank=True)
 
 
