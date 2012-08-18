@@ -6,8 +6,8 @@ from django.db import models
 
 class Company(models.Model):
     """ Organization. """
-    slug = AutoSlugField(populate_from='name')
-    name = models.CharField(max_length=100)
+    slug = AutoSlugField(populate_from='name', unique=True)
+    name = models.CharField(max_length=100, unique=True)
 
     def __unicode__(self):
         return self.name

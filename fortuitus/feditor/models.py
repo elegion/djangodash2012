@@ -13,6 +13,12 @@ class TestProject(models_base.TestProject):
     """
     company = models.ForeignKey(Company)
 
+    slug = AutoSlugField(populate_from='name')
+    name = models.CharField(max_length=100)
+
+    base_url = models.URLField()
+    common_params = ParamsField(blank=True, null=True)
+
     def __unicode__(self):
         return u'%s (%s)' % (self.name, self.base_url)
 
@@ -48,6 +54,12 @@ class TestCaseStep(models_base.TestCaseStep):
     Contains info about test requests and multiple assertions.
     """
     testcase = models.ForeignKey(TestCase)
+    order = models.PositiveSmallIntegerField()
+
+    url = models.CharField(max_length=255)
+    method = models.CharField(max_length=10, choices=method_choices,
+                              blank=True, null=True)
+    params = ParamsField(blank=True, null=True)
 
     def __unicode__(self):
         return self.url

@@ -21,8 +21,11 @@ class Params(dict):
         for name, value in data.items():
             module = value.pop('module')
             klass = value.pop('class')
-            params[name] = getattr(import_module(module), klass)(**value)
+            params[name] = getattr(import_module(module), klass).from_dict(value)
         return params
+
+    def __unicode__(self):
+        return self.dumps()
 
 
 class ParamValue(object):
@@ -35,9 +38,9 @@ class ParamValue(object):
     def as_dict(self):
         return dict((k,v) for k,v in self.__dict__.items() if not k.startswith('_'))
 
-    @staticmethod
-    def from_dict(self, params):
-        return self.__init__(**params)
+    @classmethod
+    def from_dict(klass, params):
+        return klass(**params)
 
 
 class PlainValue(ParamValue):

@@ -58,16 +58,21 @@ class ParamsTestCase(TestCase):
 
 class ParamsFieldTestCase(TestCase):
     def test_inmodel(self):
+        login = 'test_login'
         length = 7
         symbols = string.ascii_letters
 
         company = Company.objects.create(name='test')
         proj = TestProject(name='test', company=company,
             base_url='http://example.com', common_params=Params())
-        proj.common_params['login'] = RandomValue(length, symbols)
+        proj.common_params['login'] = PlainValue('test_login')
+        proj.common_params['password'] = RandomValue(length, symbols)
         proj.save()
 
-        proj2 = TestProject.objects.get(pk=proj.pk)
-        login = unicode(proj2.common_params['login'])
-        self.assertEquals(len(login), length)
-        self.assertTrue(all(c in symbols for c in login))
+        pk = proj.pk
+
+        proj2 = TestProject.objects.get(pk=pk)
+        password = unicode(proj2.common_params['password'])
+        self.assertEquals(login, unicode(proj2.common_params['login']))
+        self.assertEquals(len(password), length)
+        self.assertTrue(all(c in symbols for c in password))
