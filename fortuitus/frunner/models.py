@@ -5,6 +5,8 @@ import requests
 
 from fortuitus.feditor import models_base
 from fortuitus.feditor.models import TestProject
+from fortuitus.frunner.resolvers import (resolve_lhs, resolve_rhs,
+                                         resolve_operator)
 
 
 class TestResult:
@@ -99,4 +101,7 @@ class TestCaseAssert(models_base.TestCaseAssert):
                               blank=False, null=True)
 
     def do_assertion(self, responses):
-        pass
+        lhs = resolve_lhs(self.lhs, responses)
+        rhs = resolve_rhs(self.rhs, responses)
+        operator = resolve_operator(self.operator)(lhs, rhs)
+        return operator.run()

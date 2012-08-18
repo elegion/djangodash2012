@@ -150,6 +150,22 @@ class TestCaseModelTestCase(BaseTestCase):
                                  result=rmodels.TestResult.error)
 
 
+class TestCaseAssertTestCase(TestCase):
+    def test_do_assertion(self):
+        responses = [{'status_code': '404'}, {'status_code': '200'}]
+        a = rmodels.TestCaseAssert()
+
+        a.lhs = '0.status_code'
+        a.operator = 'Eq'
+        a.rhs = '404'
+        self.assertTrue(a.do_assertion(responses))
+
+        a.lhs = '.status_code'
+        a.operator = 'Eq'
+        a.rhs = '404'
+        self.assertFalse(a.do_assertion(responses))
+
+
 class ResolversTestCase(TestCase):
     def test_resolve_operator_short_name(self):
         """ Tests operator resolver with short operator name. """
