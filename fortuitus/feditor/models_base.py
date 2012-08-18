@@ -42,6 +42,8 @@ class TestCase(models.Model):
     slug = AutoSlugField(populate_from='name')
     name = models.CharField(max_length=100)
 
+    need_login = models.BooleanField(default=False)
+
     class Meta:
         abstract = True
 
