@@ -1,0 +1,8 @@
+key: 3CDGPCTEKNA
+vcs: git
+framework: django
+requirements_file: requirements.txt
+wsgi:
+    entry_point: fortuitus.wsgi:application
+django:
+    manage.py: manage.py
