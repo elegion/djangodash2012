@@ -28,14 +28,130 @@ class RunTestsTaskTestCase(BaseTestCase):
         """
         Should raise emodels.TestCase.DoesNotExist if test case not found.
         """
-        with self.assertRaises(emodels.TestProject.DoesNotExist):
+        with self.assertRaises(rmodels.TestRun.DoesNotExist):
             run_tests(10000)
 
     @mock.patch('fortuitus.frunner.models.TestRun.run', mock.Mock())
-    def test_copies_and_runs_testcase(self):
+    def test_runs_testcase(self):
         """
-        Should copy TestCase (and all related models) int
-        frunner.models.TestCase then perform frunner.models.TestCase.run()
+        Should call TestRun.run
+        """
+        testrun = rfactories.TestRunF.create()
+
+        run_tests(testrun.pk)
+
+        rmodels.TestRun.run.assert_called_once_with()
+
+
+class IntegrationTestCase(BaseTestCase):
+    def test_run_tests(self):
+        """ Testcases should be passable
+        """
+        start = timezone.now()
+
+        testcase = rfactories.TestCaseF.create()
+        rfactories.TestCaseF.create(testrun=testcase.testrun)
+        step1 = rfactories.TestCaseStepF.create(testcase=testcase, order=1)
+        step2 = rfactories.TestCaseStepF.create(testcase=testcase, url='groups.json', order=2)
+        rfactories.TestCaseAssertF.create(step=step2, lhs='.status_code', rhs='200', operator='eq', order=1)
+        rfactories.TestCaseAssertF.create(step=step2, lhs='.text', rhs='Hello, world!', operator='eq', order=2)
+
+        def my_side_effect(*args, **kwargs):
+            if args[0] == 'GET' and args[1] == '%s%s' % (testcase.testrun.base_url, step1.url):
+                return ResponseF()
+            elif args[0] == 'GET' and args[1] == '%s%s' % (testcase.testrun.base_url, step2.url):
+                return ResponseF(content='Hello, world!')
+            else:
+                raise AssertionError('Unexpected requests.request arguments: %s, %s' % (args, kwargs))
+        with mock.patch('requests.request', mock.Mock(side_effect=my_side_effect)):
+            run_tests(testcase.testrun.pk)
+            self.assertEqual(2, requests.request.call_count)
+
+        self.assertEqual(1, rmodels.TestRun.objects.count())
+        self.assertObject(rmodels.TestRun.objects.all()[0],
+                          result=rmodels.TestResult.success)
+
+        self.assertEqual(2, rmodels.TestCase.objects.count())
+        self.assertObject(rmodels.TestCase.objects.all()[0],
+                          start_date__gte=start,
+                          end_date__gte=start,
+                          result=rmodels.TestResult.success)
+        self.assertObject(rmodels.TestCase.objects.all()[1],
+                          start_date__gte=start,
+                          end_date__gte=start,
+                          result=rmodels.TestResult.success)
+
+    @mock.patch('requests.request', mock.Mock(return_value=ResponseF(status_code=404, content='Wazup!')))
+    def test_run_tests2(self):
+        """ Test cases should be failable
+        """
+        start = timezone.now()
+
+        testcase = rfactories.TestCaseF.create()
+        rfactories.TestCaseF.create(testrun=testcase.testrun)
+        step1 = rfactories.TestCaseStepF.create(testcase=testcase, order=1)
+        rfactories.TestCaseAssertF.create(step=step1, lhs='.text', rhs='Wazup!', operator='eq', order=1)
+        rfactories.TestCaseAssertF.create(step=step1, lhs='.status_code', rhs='200', operator='eq', order=2)
+        step2 = rfactories.TestCaseStepF.create(testcase=testcase, url='groups.json', order=2)
+        rfactories.TestCaseAssertF.create(step=step2, lhs='.status_code', rhs='200', operator='eq')
+        rfactories.TestCaseAssertF.create(step=step2, lhs='.text', rhs='Hello, world!', operator='eq')
+
+        run_tests(testcase.testrun.pk)
+
+        self.assertEqual(1, requests.request.call_count)
+
+        self.assertEqual(1, rmodels.TestRun.objects.count())
+        self.assertObject(rmodels.TestRun.objects.all()[0],
+                          result=rmodels.TestResult.fail)
+
+        self.assertEqual(2, rmodels.TestCase.objects.count())
+        self.assertObject(rmodels.TestCase.objects.all()[0],
+                          start_date__gte=start,
+                          end_date__gte=start,
+                          result=rmodels.TestResult.fail)
+        self.assertObject(rmodels.TestCase.objects.all()[1],
+                          start_date__gte=start,
+                          end_date__gte=start,
+                          result=rmodels.TestResult.success)
+        self.assertEqual(2, rmodels.TestCaseStep.objects.count())
+        self.assertObject(rmodels.TestCaseStep.objects.all()[0],
+                          result=rmodels.TestResult.fail,
+                          exception='AssertionError: 404 should be eq 200')
+
+    @mock.patch('requests.request', mock.Mock(side_effect=requests.Timeout('bad for you')))
+    def test_run_tests3(self):
+        """ Testcases can raise errors, and they are handled
+        """
+        start = timezone.now()
+
+        testcase = rfactories.TestCaseF.create()
+        step1 = rfactories.TestCaseStepF.create(testcase=testcase, order=1)
+        rfactories.TestCaseAssertF.create(step=step1, lhs='.text', rhs='Wazup!', operator='eq', order=1)
+        rfactories.TestCaseAssertF.create(step=step1, lhs='.status_code', rhs='200', operator='eq', order=2)
+        step2 = rfactories.TestCaseStepF.create(testcase=testcase, url='groups.json', order=2)
+        rfactories.TestCaseAssertF.create(step=step2, lhs='.status_code', rhs='200', operator='eq')
+        rfactories.TestCaseAssertF.create(step=step2, lhs='.text', rhs='Hello, world!', operator='eq')
+
+        run_tests(testcase.testrun.pk)
+
+        self.assertEqual(1, requests.request.call_count)
+
+        self.assertEqual(1, rmodels.TestCase.objects.count())
+        self.assertObject(rmodels.TestCase.objects.all()[0],
+            start_date__gte=start,
+            end_date__gte=start,
+            result=rmodels.TestResult.error)
+        self.assertEqual(2, rmodels.TestCaseStep.objects.count())
+        self.assertObject(rmodels.TestCaseStep.objects.all()[0],
+            result=rmodels.TestResult.error,
+            exception='Timeout: bad for you')
+
+
+class TestRunModelTestCase(BaseTestCase):
+    def test_create_from_project(self):
+        """
+        Should copy TestProject and (and all related TestCases, TestCaseSteps, etc)
+        and return :model:`frunner.TestRun`
         """
         test_case = efactories.TestCaseF.create()
         step1 = efactories.TestCaseStepF.create(testcase=test_case)
@@ -45,9 +161,7 @@ class RunTestsTaskTestCase(BaseTestCase):
         assertion_3_1 = efactories.TestCaseAssertF.create(step=step3)
         assertion_3_2 = efactories.TestCaseAssertF.create(step=step3)
 
-        run_tests(test_case.pk)
-
-        rmodels.TestRun.run.assert_called_once_with()
+        rmodels.TestRun.create_from_project(test_case.project)
 
         self.assertEqual(1, rmodels.TestCase.objects.count())
         test_case_copy = rmodels.TestCase.objects.all()[0]
@@ -75,126 +189,30 @@ class RunTestsTaskTestCase(BaseTestCase):
         self.assertEqual(assertion_2_1.rhs, assertion_2_1_copy.rhs)
         self.assertEqual(assertion_2_1.operator, assertion_2_1_copy.operator)
 
-    @mock.patch('fortuitus.frunner.models.TestRun.run', mock.Mock())
     def test_test_cases_can_be_duplicated(self):
         """
-        Should copy same TestCase twice without raising "primary key must be
+        Should copy same TestProject twice without raising "primary key must be
         unique" IntegrityError.
         """
-        count = rmodels.TestCase.objects.all().count
         test_case = efactories.TestCaseF.create()
         step = efactories.TestCaseStepF.create(testcase=test_case)
         efactories.TestCaseStepF.create(testcase=test_case)
         efactories.TestCaseAssertF.create(step=step)
         efactories.TestCaseAssertF.create(step=step)
-        self.assertEqual(count(), 0)
-        run_tests(test_case.project_id)
-        self.assertEqual(count(), 1)
-        run_tests(test_case.project_id)
-        self.assertEqual(count(), 2)
-        rmodels.TestRun.run.assert_has_calls([mock.call(), mock.call()])
 
+        self.assertEqual(rmodels.TestRun.objects.all().count(), 0)
 
-class IntegrationTestCase(BaseTestCase):
-    def test_run_tests(self):
-        """ Testcases should be passable
-        """
-        start = timezone.now()
+        rmodels.TestRun.create_from_project(test_case.project)
+        self.assertEqual(1, rmodels.TestRun.objects.all().count())
+        self.assertEqual(1, rmodels.TestCase.objects.all().count())
+        self.assertEqual(2, rmodels.TestCaseStep.objects.all().count())
+        self.assertEqual(2, rmodels.TestCaseAssert.objects.all().count())
 
-        testcase = efactories.TestCaseF.create()
-        efactories.TestCaseF.create(project=testcase.project)
-        step1 = efactories.TestCaseStepF.create(testcase=testcase)
-        step2 = efactories.TestCaseStepF.create(testcase=testcase, url='groups.json')
-        efactories.TestCaseAssertF.create(step=step2, lhs='.status_code', rhs='200', operator='eq')
-        efactories.TestCaseAssertF.create(step=step2, lhs='.text', rhs='Hello, world!', operator='eq')
-
-        def my_side_effect(*args, **kwargs):
-            if args[0] == 'GET' and args[1] == '%s%s' % (testcase.project.base_url, step1.url):
-                return ResponseF()
-            elif args[0] == 'GET' and args[1] == '%s%s' % (testcase.project.base_url, step2.url):
-                return ResponseF(content='Hello, world!')
-            else:
-                raise AssertionError('Unexpected requests.request arguments: %s, %s' % (args, kwargs))
-        with mock.patch('requests.request', mock.Mock(side_effect=my_side_effect)):
-            run_tests(testcase.project_id)
-            self.assertEqual(2, requests.request.call_count)
-
-        self.assertEqual(1, rmodels.TestRun.objects.count())
-        self.assertObject(rmodels.TestRun.objects.all()[0],
-                          result=rmodels.TestResult.success)
-
-        self.assertEqual(2, rmodels.TestCase.objects.count())
-        self.assertObject(rmodels.TestCase.objects.all()[0],
-                          start_date__gte=start,
-                          end_date__gte=start,
-                          result=rmodels.TestResult.success)
-        self.assertObject(rmodels.TestCase.objects.all()[1],
-                          start_date__gte=start,
-                          end_date__gte=start,
-                          result=rmodels.TestResult.success)
-
-    @mock.patch('requests.request', mock.Mock(return_value=ResponseF(status_code=404, content='Wazup!')))
-    def test_run_tests2(self):
-        """ Test cases should be failable
-        """
-        start = timezone.now()
-
-        testcase = efactories.TestCaseF.create()
-        efactories.TestCaseF.create(project=testcase.project)
-        step1 = efactories.TestCaseStepF.create(testcase=testcase, order=1)
-        efactories.TestCaseAssertF.create(step=step1, lhs='.text', rhs='Wazup!', operator='eq', order=1)
-        efactories.TestCaseAssertF.create(step=step1, lhs='.status_code', rhs='200', operator='eq', order=2)
-        step2 = efactories.TestCaseStepF.create(testcase=testcase, url='groups.json', order=2)
-        efactories.TestCaseAssertF.create(step=step2, lhs='.status_code', rhs='200', operator='eq')
-        efactories.TestCaseAssertF.create(step=step2, lhs='.text', rhs='Hello, world!', operator='eq')
-
-        run_tests(testcase.pk)
-
-        self.assertEqual(1, requests.request.call_count)
-
-        self.assertEqual(1, rmodels.TestRun.objects.count())
-        self.assertObject(rmodels.TestRun.objects.all()[0],
-                          result=rmodels.TestResult.fail)
-
-        self.assertEqual(2, rmodels.TestCase.objects.count())
-        self.assertObject(rmodels.TestCase.objects.all()[0],
-                          start_date__gte=start,
-                          end_date__gte=start,
-                          result=rmodels.TestResult.fail)
-        self.assertObject(rmodels.TestCase.objects.all()[1],
-                          start_date__gte=start,
-                          end_date__gte=start,
-                          result=rmodels.TestResult.success)
-        self.assertEqual(2, rmodels.TestCaseStep.objects.count())
-        self.assertObject(rmodels.TestCaseStep.objects.all()[0],
-                          result=rmodels.TestResult.fail,
-                          exception='AssertionError: 404 should be eq 200')
-
-    @mock.patch('requests.request', mock.Mock(side_effect=requests.Timeout('bad for you')))
-    def test_run_tests3(self):
-        start = timezone.now()
-
-        testcase = efactories.TestCaseF.create()
-        step1 = efactories.TestCaseStepF.create(testcase=testcase, order=1)
-        efactories.TestCaseAssertF.create(step=step1, lhs='.text', rhs='Wazup!', operator='eq', order=1)
-        efactories.TestCaseAssertF.create(step=step1, lhs='.status_code', rhs='200', operator='eq', order=2)
-        step2 = efactories.TestCaseStepF.create(testcase=testcase, url='groups.json', order=2)
-        efactories.TestCaseAssertF.create(step=step2, lhs='.status_code', rhs='200', operator='eq')
-        efactories.TestCaseAssertF.create(step=step2, lhs='.text', rhs='Hello, world!', operator='eq')
-
-        run_tests(testcase.pk)
-
-        self.assertEqual(1, requests.request.call_count)
-
-        self.assertEqual(1, rmodels.TestCase.objects.count())
-        self.assertObject(rmodels.TestCase.objects.all()[0],
-            start_date__gte=start,
-            end_date__gte=start,
-            result=rmodels.TestResult.error)
-        self.assertEqual(2, rmodels.TestCaseStep.objects.count())
-        self.assertObject(rmodels.TestCaseStep.objects.all()[0],
-            result=rmodels.TestResult.error,
-            exception='Timeout: bad for you')
+        rmodels.TestRun.create_from_project(test_case.project)
+        self.assertEqual(2, rmodels.TestRun.objects.all().count())
+        self.assertEqual(2, rmodels.TestCase.objects.all().count())
+        self.assertEqual(4, rmodels.TestCaseStep.objects.all().count())
+        self.assertEqual(4, rmodels.TestCaseAssert.objects.all().count())
 
 
 class TestCaseModelTestCase(BaseTestCase):

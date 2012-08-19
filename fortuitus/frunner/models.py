@@ -1,4 +1,5 @@
 from django.db import models
+from django.forms.models import model_to_dict
 from django.utils import timezone
 from jsonfield import JSONField
 import requests
@@ -36,6 +37,25 @@ class TestRun(models.Model):
     end_date = models.DateTimeField(null=True, blank=True)
     result = models.CharField(max_length=10, choices=TEST_CASE_RESULT_CHOICES,
                               blank=False, null=True)
+
+    @staticmethod
+    def create_from_project(project):
+        testrun = TestRun.objects.create(project=project,
+                                         base_url=project.base_url,
+                                         common_params=project.common_params)
+        # Now copy all testcases and related data
+        for etest in project.testcases.all():
+            kwargs = model_to_dict(etest, exclude=['id', 'project'])
+            rtest = TestCase.objects.create(testrun=testrun, **kwargs)
+
+            for estep in etest.steps.all():
+                kwargs = model_to_dict(estep, exclude=['id', 'testcase'])
+                rstep = TestCaseStep.objects.create(testcase=rtest, **kwargs)
+
+                for assertion in estep.assertions.all():
+                    kwargs = model_to_dict(assertion, exclude=['id', 'step'])
+                    TestCaseAssert.objects.create(step=rstep, **kwargs)
+
 
     def run(self):
         for testcase in self.testcases.all():
