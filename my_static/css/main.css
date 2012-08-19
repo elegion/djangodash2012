@@ -43,30 +43,30 @@
     }
     .marketing p {
         margin-right: 0;
+        line-height: 1.3em;
     }
     .marketing img {
-        width: 140px;
-        height: 80px;
-        background: #EEE;
         float: left;
         margin: 7px 1em 2em 30px;
         border: 3px solid #EEE;
     }
+    .marketing3 img {
+        border: none;
+    }
 
 .testimonials {
-    padding-left: 30px;
     margin: 1.5em 0 0 0;
 }
     .testimonials h2 {
-        margin: 0 0 0.6em 0;
+        margin: 0 0 0.6em 30px;
     }
     .testimonials img {
         float: left;
-        margin: 7px 1em 2em 0;
-        border: 3px solid #EEE;
+        margin: 7px 1em 2em 30px;
+        border: 3px solid #DDD;
     }
     .testimonials p {
-        margin: 12px 20px 0 0;
+        margin: 12px 0px 0 0;
     }
     .testimonials p.author {
         font-size: 13px;
@@ -85,9 +85,15 @@ body {
     padding-bottom: 60px;
 }
 /* /Home page */
+
 .navbar .brand {
     font-family: 'Ubuntu Mono', sans-serif; /* TODO: replace with picture*/
-    color: #FFF;
+    color: #bcff46;
+    padding: 10px 95px 9px 25px;
+    font-weight: bold;
+}
+.navbar .nav > li > a {
+    padding: 9px 15px 11px;
 }
 .navbar-inner {
     border-radius: 0;
@@ -150,9 +156,9 @@ h2 {
             position: relative;
             width: 30em;
             padding: 0 35px 0 0;
-            margin-top: 0.7em;
         }
         .teststeps li .params {
+            margin-top: 0.7em;
         }
             .teststeps li .params td.name {
                 width: 50%;
