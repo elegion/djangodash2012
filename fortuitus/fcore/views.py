@@ -29,3 +29,9 @@ def signup(request):
 
     return TemplateResponse(request, 'fortuitus/fcore/registration.html',
                             {'form': form})
+
+
+def demo(request):
+    """ Demo mode. Automatically sign in demo user and show 'em dashboard. """
+    # TODO autologin
+    return redirect('feditor_project', company='demo', project='twitter')

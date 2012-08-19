@@ -11,4 +11,5 @@ urlpatterns = patterns('',
     url(r'^login/$', 'django.contrib.auth.views.login',
         {'template_name': 'fortuitus/fcore/login.html'}, name='login'),
     url(r'^signup/$', views.signup, name='signup'),
+    url(r'^demo/$', views.demo, name='demo'),
 )

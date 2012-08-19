@@ -7,7 +7,7 @@
     <h1>API Tester</h1>
     <p>Amazing online tool to create automatic acceptance tests for REST/JSON APIs.</p>
     <p class="actions">
-      <a href="{% url feditor_project company='demo' project='twitter' %}" class="btn btn-large btn-primary">Try Demo</a>
+      <a href="{% url demo %}" class="btn btn-large btn-primary">Try Demo</a>
       {% if not user.is_authenticated %}
         <a href="{% url signup %}" class="btn btn-large btn-success">Free Sign Up</a>
       {% endif %}
