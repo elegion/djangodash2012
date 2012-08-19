@@ -186,32 +186,32 @@ class ResolversTestCase(TestCase):
 
     def test_resolve_lhs_last_response(self):
         """ Test lhs resolver: last response, dictionary. """
-        from .resolvers import resolve_lhs
+        from fortuitus.frunner.resolvers import resolve_lhs
         responses = [{'status_code': 404}, {'status_code': 200}]
         self.assertEqual(resolve_lhs('.status_code', responses), 200)
 
     def test_resolve_lhs_arbitrary_response(self):
         """ Test lhs resolver: arbitrary response, dictionary. """
-        from .resolvers import resolve_lhs
+        from fortuitus.frunner.resolvers import resolve_lhs
         responses = [{'status_code': 404}, {'status_code': 200}]
         self.assertEqual(resolve_lhs('0.status_code', responses), 404)
 
     def test_resolve_lhs_object(self):
         """ Test lhs resolver: arbitrary response, object. """
-        from .resolvers import resolve_lhs
+        from fortuitus.frunner.resolvers import resolve_lhs
         responses = [type('TestResp', (), {'status_code': 200})]
         self.assertEqual(responses[0].status_code, 200)
         self.assertEqual(resolve_lhs('0.status_code', responses), 200)
 
     def test_resolve_rhs_plain_value(self):
         """ Test rhs resolver: plain value. """
-        from .resolvers import resolve_rhs
+        from fortuitus.frunner.resolvers import resolve_rhs
         self.assertEqual(resolve_rhs(1, []), 1)
         self.assertEqual(resolve_rhs('foo', []), 'foo')
 
     def test_resolve_rhs_reference(self):
         """ Test rhs resolver: step reference. """
-        from .resolvers import resolve_rhs
+        from fortuitus.frunner.resolvers import resolve_rhs
         responses = [{'status_code': 404}, {'status_code': 200}]
         self.assertEqual(resolve_rhs('1.status_code', responses), 200)
 
