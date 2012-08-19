@@ -31,10 +31,14 @@ class TestProject(models.Model):
     objects = TestProjectManager()
 
     class Meta():
-        ordering = ('slug',)
+        ordering = ('created',)
 
     def __unicode__(self):
         return u'%s (%s)' % (self.name, self.base_url)
+
+    def lastrun(self):
+        runs = self.test_runs.order_by('-start_date')
+        return runs and runs[0] or None
 
 
 class TestCaseManager(models.Manager):

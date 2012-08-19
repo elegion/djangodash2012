@@ -4,12 +4,17 @@
   <div class="navbar">
     <div class="navbar-inner">
       <div class="container">
-        <a class="brand" href="{% url home %}">API Tester</a>
+        <a class="brand" href="{% url home %}">API Tester
+          {% if user %}
+          { {{ user.fortuitusprofile.company.name }} }
+          {% endif %}
+        </a>
         <ul class="nav">
           {% if user.is_authenticated %}
             <li class="active"><a href="{% url fcore_projects_list company_slug=user.fortuitusprofile.company.slug %}">Projects</a></li>
           {% endif %}
-          <li><a href="{% url feditor_project company_slug='demo' project_slug='twitter' %}">DEMO EDIT</a></li>
+{#          <li><a href="{% url feditor_project company_slug='demo' project_slug='twitter' %}">DEMO EDIT</a></li>#}
+{#          <li><a href="{% url frunner_run_project company_slug=user.fortuitusprofile.company.slug project_slug=project.slug %}">Runs</a></li>#}
         </ul>
         <ul class="nav pull-right">
           <li><a href="{% url logout %}">&times; Logout</a></li>

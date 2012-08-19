@@ -171,6 +171,7 @@ TEST_RUNNER = 'djcelery.contrib.test_runner.CeleryTestSuiteRunner'
 
 LOGIN_URL = reverse_lazy('login')
 LOGIN_REDIRECT_URL = reverse_lazy('home')
+DATETIME_FORMAT = 'd/M/Y'
 
 # Django-compressor settings
 COMPRESS_OFFLINE = True

@@ -10,8 +10,9 @@
 
     <div class="row">
       <div class="well span6">
-        <p>Test Project is a holder for concrete API tests.</p>
-        <p>Test Project </p>
+        <p>Test Project is a holder for concrete API tests.
+        It holds API base url, user accounts and common params.</p>
+        <p>Usually you need one project per API or two: one for production and one for dev-version.</p>
       </div>
     </div>
   </header>
@@ -19,9 +20,36 @@
   <ul class="projects">
     {% for project in projects %}
       <li>
-        <a href="{% url frunner_project_runs company_slug=company.slug project_slug=project.slug %}">
-          {{ project.name }}
-        </a>
+        <div class="row">
+          <div class="name span2">
+            <span class="status status-icon{% if project.lastrun %} icon-assert-{{ project.lastrun.result }}{% endif %}"></span>
+            {{ project.name }}
+          </div>
+
+          <div class="buttons span2">
+            <form method="POST" action="{% url frunner_run_project company_slug=company.slug project_slug=project.slug %}">
+              {% csrf_token %}
+              <input type="submit" class="btn btn-success" value="Run" />
+            <a class="btn btn-primary"
+               href="{% url feditor_project company_slug=company.slug project_slug=project.slug %}">Edit</a>
+            </form>
+          </div>
+        </div>
+
+        <div class="row statistic">
+          <div class="span1">Tests: {{ project.testcases.count }}</div>
+          {% if project.lastrun %}
+          <div class="span6">
+            <span class="date"><a href="{% url frunner_testrun company_slug=company.slug project_slug=project.slug testrun_number=project.lastrun.pk %}">
+              {{ project.lastrun.start_date|date:"SHORT_DATETIME_FORMAT" }}</a>
+            </span>
+            <span class="passed">Passed: {{ project.lastrun.passed_tests.count }}</span>
+            <span class="failed">Failed: {{ project.lastrun.failed_tests.count }}</span>
+            <span class="errors">Errors: {{ project.lastrun.error_tests.count }}</span>
+          </div>
+          {% endif %}
+        </div>
+
       </li>
     {% endfor %}
   </ul>

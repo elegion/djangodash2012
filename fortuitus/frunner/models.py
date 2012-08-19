@@ -91,6 +91,15 @@ class TestRun(models.Model):
         logger.info('Finished TestRun %s (result=%s)', self, self.result)
         return self.result
 
+    def failed_tests(self):
+        return self.testcases.filter(result=TestResult.fail)
+
+    def error_tests(self):
+        return self.testcases.filter(result=TestResult.error)
+
+    def passed_tests(self):
+        return self.testcases.filter(result=TestResult.success)
+
 
 class TestCase(models_base.TestCase):
     """
