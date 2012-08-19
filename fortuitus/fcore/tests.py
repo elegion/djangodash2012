@@ -1,7 +1,8 @@
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 
-from fortuitus.fcore.factories import UserF
+from core.tests import BaseTestCase
+from fortuitus.fcore.factories import UserF, CompanyF
 from fortuitus.fcore.models import FortuitusProfile
 
 
@@ -30,3 +31,25 @@ class ProfileTestCase(TestCase):
         u2 = UserF.create(username='u2')
         p2 = FortuitusProfile.objects.get(user_id=u2.pk)
         self.assertNotEqual(p1, p2)
+
+
+class ProjectsListTestCase(BaseTestCase):
+    def test_renders_template(self):
+        """ Tests if projects list page is rendered properly. """
+        user = self.login_user()
+        company = CompanyF.create()
+        user.fortuitusprofile.company = company
+        user.fortuitusprofile.save()
+        url = reverse('fcore_projects_list',
+                      kwargs={'company_slug': company.slug})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed('fortuitus/fcore/projects_list.html')
+
+    def test_requires_login(self):
+        """ Tests if projects list page is rendered properly. """
+        company = CompanyF.create()
+        url = reverse('fcore_projects_list',
+                      kwargs={'company_slug': company.slug})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
