@@ -13,7 +13,8 @@
             <a href="{% url frunner_testrun company_slug=company.slug project_slug=project.slug testrun_number=testrun.number testcase_slug=tc.slug %}">
               {{ tc.result_symbol }}
               {{ tc.name }}
-            </a></li>
+            </a>
+          </li>
         {% endfor %}
       </ul>
       {% include 'fortuitus/feditor/_add_testcase_form.html' %}

@@ -1,41 +1,41 @@
 {% extends 'site_base.html' %}
 {% load bootstrap %}
 {% block content %}
-    <div class="row-fluid">
-        <div class="span2 sidebar">
-            <h1>{{ project.name }}</h1>
-            <ul class="testcases">
-                {% for tc in project.testcases.all %}
-                    <li{% if tc.pk == testcase.pk %} class="active"{% endif %}>
-                        <a href="{% url feditor_project company_slug=project.company.slug project=project.slug %}?testcase={{ tc.slug }}">
-                            {{ tc.name }}
-                        </a>
-                    </li>
-                {% endfor %}
-            </ul>
-            {% include 'fortuitus/feditor/_add_testcase_form.html' %}
-        </div>
-        <div class="span10">
-            {% if not testcase %}
-                <div class="hero-unit">
-                    <h1>Test will be here!</h1>
-                    <p>Why not to add first of them right now?</p>
-                    <p>{% include 'fortuitus/feditor/_add_testcase_form.html' %}</p>
-                </div>
-            {% else %}
-                <form method="post" class="testcase-info-form{% if new %} js_show{% endif %}">
-                {% csrf_token %}
-                {{ tc_form|bootstrap }}
-                <button type="submit" class="btn btn-primary">Save</button>
-                </form>
-                {% include 'fortuitus/feditor/_testcase.html' %}
-            {% endif %}
-        </div>
+  <div class="row-fluid">
+    <div class="span2 sidebar">
+      <h1>{{ project.name }}</h1>
+      <ul class="testcases">
+        {% for tc in project.testcases.all %}
+          <li{% if tc.pk == testcase.pk %} class="active"{% endif %}>
+            <a href="{% url feditor_project company_slug=project.company.slug project=project.slug %}?testcase={{ tc.slug }}">
+              {{ tc.name }}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+      {% include 'fortuitus/feditor/_add_testcase_form.html' %}
     </div>
+    <div class="span10">
+      {% if not testcase %}
+        <div class="hero-unit">
+          <h1>Test will be here!</h1>
+          <p>Why not to add first of them right now?</p>
+          <p>{% include 'fortuitus/feditor/_add_testcase_form.html' %}</p>
+        </div>
+      {% else %}
+        <form method="post" class="testcase-info-form{% if new %} js_show{% endif %}">
+          {% csrf_token %}
+          {{ tc_form|bootstrap }}
+          <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+        {% include 'fortuitus/feditor/_testcase.html' %}
+      {% endif %}
+    </div>
+  </div>
 {% endblock %}
 
 {% block footerjs %}
-Fortuitus.initEditTestcaseForm();
-Fortuitus.initEditTestStep();
-Fortuitus.initEditAssert();
+  Fortuitus.initEditTestcaseForm();
+  Fortuitus.initEditTestStep();
+  Fortuitus.initEditAssert();
 {% endblock %}
