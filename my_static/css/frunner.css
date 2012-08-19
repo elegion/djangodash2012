@@ -16,6 +16,36 @@
 
 .teststeps-results {
 }
+  .teststeps-results li .params {
+    width: auto;
+    min-width: 30em;
+    max-width: 100%;
+    word-wrap: break-word;
+    word-break: break-all;
+  }
+    .teststeps-results li .params td.name,
+    .teststeps-results li .params td.value,
+    .teststeps-results li .params td.expression {
+      width: 33%;
+    }
+
+  .teststeps-results li .headers {
+    width: auto;
+    min-width: 30em;
+    max-width: 100%;
+    word-wrap: break-word;
+    word-break: break-all;
+  }
+    .teststeps-results li .headers .name {
+      min-width: 20ex;
+    }
+
+   .teststeps-results .well {
+     word-wrap: break-word;
+     word-break: break-all;
+     white-space: pre-wrap;
+   }
+
   .teststeps-results li.result-error div.teststep-wrapper,
   .teststeps-results li.assert.result-fail div.teststep-wrapper {
     margin: 0 0 0 -10px;
