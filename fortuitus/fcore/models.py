@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from autoslug.fields import AutoSlugField
 from django.contrib.auth.models import User
 from django.db import models
@@ -19,6 +21,9 @@ class FortuitusProfile(models.Model):
     user = models.OneToOneField(User)
     # TODO: support multiple organizations.
     company = models.ForeignKey(Company, null=True, blank=True)
+
+    def __unicode__(self):
+        return 'User %s (%d) profile' % (self.user.username, self.user.pk)
 
 
 @receiver(post_save, sender=User)
