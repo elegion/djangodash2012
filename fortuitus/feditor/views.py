@@ -9,10 +9,10 @@ from fortuitus.feditor.params import Params
 from fortuitus.feditor.rights import can_edit_project
 
 
-def project(request, company, project):
+def project(request, company_slug, project_slug):
     """ Project page view. """
-    project = get_object_or_404(TestProject, company__slug=company,
-                                slug=project)
+    project = get_object_or_404(TestProject, company__slug=company_slug,
+                                slug=project_slug)
     testcases = project.testcases.all()
 
     testcase = None
@@ -97,10 +97,12 @@ def project(request, company, project):
     return TemplateResponse(request, 'fortuitus/feditor/project.html', data)
 
 
-def testcase(request, company, project, test):
+def testcase(request, company_slug, project_slug, test):
     """ TestCase page view. """
-    testcase = get_object_or_404(TestCase, project__company__slug=company,
-                                 project__slug=project, slug=test)
+    testcase = get_object_or_404(TestCase,
+                                 project__company__slug=company_slug,
+                                 project__slug=project_slug,
+                                 slug=test)
     data = {
         'testcase': testcase
     }

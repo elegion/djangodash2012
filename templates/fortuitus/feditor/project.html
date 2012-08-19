@@ -7,7 +7,7 @@
       <ul class="testcases">
         {% for tc in project.testcases.all %}
           <li{% if tc.pk == testcase.pk %} class="active"{% endif %}>
-            <a href="{% url feditor_project company_slug=project.company.slug project=project.slug %}?testcase={{ tc.slug }}">
+            <a href="{% url feditor_project company_slug=project.company.slug project_slug=project.slug %}?testcase={{ tc.slug }}">
               {{ tc.name }}
             </a>
           </li>
