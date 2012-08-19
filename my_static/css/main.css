@@ -151,6 +151,9 @@ h2 {
                 font-size: 13px; /*@baseFontSize*/
                 margin-top: 0.5em;
             }
+        .teststeps li .params {
+            width: auto;
+        }
 
 .testcase-info-form {
     display: none;
@@ -166,4 +169,12 @@ h2 {
 
 .error {
     color: red;
+}
+
+.delete-button {
+    color: #F00;
+    font-size: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0 10px 0 0;
 }

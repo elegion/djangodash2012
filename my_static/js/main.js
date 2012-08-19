@@ -23,4 +23,8 @@ Fortuitus.initEditTestcaseForm = function() {
 
 $(document).ready(function() {
     Fortuitus.initEditTestcaseForm();
+    EditableTable.init($('.js_params'),
+        function(input) {
+            $(input).closest('form').find('.js_save').show();
+        });
 });

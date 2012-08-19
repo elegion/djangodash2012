@@ -13,11 +13,22 @@
     {% for step in testcase.steps.all %}
         <li><span>
             <span class="method">{{ step.get_method_display }}</span> {{ step.url }}
-            <ul class="params">
-            {% for name, value in step.params.items %}
-                <li>{{ name }} = {{ value }}</li>
-            {% endfor %}
-            </ul>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="save_step">
+                <input type="hidden" name="teststep" value="{{ step.pk }}">
+                <table class="params js_params table table-striped table-bordered">
+                <tbody>
+                {% for name, value in step.params.items %}
+                    <tr class="step_{{ name }}">
+                        <td class="name"><input type="hidden" name="js_{{ name }}" value="{{ value }}">{{ name }}</td>
+                        <td class="value">{{ value }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                </table>
+                <button class="btn btn-primary js_save" style="display:none">Save</button>
+            </form>
         </span></li>
     {% endfor %}
 </ol>

@@ -3,7 +3,8 @@ from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from fortuitus.fcore.models import Company
 from fortuitus.feditor.forms import TestCaseForm
-from fortuitus.feditor.models import TestProject, TestCase
+from fortuitus.feditor.models import TestProject, TestCase, TestCaseStep
+from fortuitus.feditor.params import Params
 from fortuitus.feditor.rights import can_edit_project
 
 
@@ -30,6 +31,17 @@ def project(request, company, project):
         if request.POST.get('action') == 'delete_testcase':
             TestCase.objects.filter(pk=request.POST.get('testcase')).delete()
             return redirect(request.path)
+
+        if request.POST.get('action') == 'save_step':
+            step = TestCaseStep.objects.filter(pk=request.POST.get('teststep'))
+            if step:
+                step = step[0]
+                step.params = Params()
+                for param in request.POST:
+                    if param.startswith('js_'):
+                        step.params[param[3:]] = request.POST[param]
+                step.save()
+            return redirect(request.path + '?testcase=%s' % testcase.slug)
 
         tc_form = TestCaseForm(request.POST, instance=testcase)
         if tc_form.is_valid():
