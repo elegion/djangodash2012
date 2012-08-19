@@ -15,7 +15,7 @@
 {% block content %}
   <div class="row-fluid">
     <div class="span2 sidebar">
-      <h1>{{ project.name }}</h1>
+      <h1><a href="{% url frunner_project_runs company_slug=company.slug project_slug=project.slug %}">{{ project.name }}</a></h1>
       <h3>{{ testrun.human_name }}</h3>
       <ul class="testcases">
         {% for tc in testrun.testcases.all %}
