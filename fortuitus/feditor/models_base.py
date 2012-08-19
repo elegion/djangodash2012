@@ -47,7 +47,8 @@ class TestCase(models.Model):
     name = models.CharField(max_length=100)
     order = models.PositiveSmallIntegerField()
 
-    login_type = models.CharField(max_length=16, choices=login_type_choices)
+    login_type = models.CharField(max_length=16, choices=login_type_choices,
+                                  default=LoginType.NONE)
     login_options = JSONField(null=True, blank=True)
 
     class Meta:
