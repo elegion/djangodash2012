@@ -37,7 +37,7 @@ def testrun(request, project_id, testrun_id):
     project = get_object_or_404(TestProject, pk=project_id)
     testrun = get_object_or_404(TestRun, pk=testrun_id)
     context = {'project': project,
-               'test_case': testrun}
+               'testrun': testrun}
     return TemplateResponse(request, 'fortuitus/frunner/testrun.html',
                             context)
 

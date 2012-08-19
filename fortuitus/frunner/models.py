@@ -58,12 +58,18 @@ class TestRun(models.Model):
         return testrun
 
     def run(self):
+        self.start_date = timezone.now()
+        self.save()
+
         for testcase in self.testcases.all():
             testcase.run(self)
             if testcase.result != TestResult.success:
                 self.result = TestResult.fail
+
+        self.end_date = timezone.now()
         self.result = self.result or TestResult.success
         self.save()
+        return self.result
 
 
 class TestCase(models_base.TestCase):

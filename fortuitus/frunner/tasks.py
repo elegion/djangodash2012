@@ -21,4 +21,4 @@ def run_tests(testrun_id):
 
     """
     testrun = rmodels.TestRun.objects.get(pk=testrun_id)
-    testrun.run()
+    return testrun.run()
