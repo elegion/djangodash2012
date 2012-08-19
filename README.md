@@ -14,3 +14,37 @@ What
 ----
 
 Online tool to create automatic acceptance tests for REST/JSON APIs.
+
+Tips and tricks
+---------------
+
+### Query parameters
+
+Query parameters support special mini-language. Currently it is possible to
+provide either plain value by simply typing it in the field, or a random value,
+typing `{random}` special form:
+
+    {random:7:d}
+    {random:8:7}
+    {random:140}
+
+The special form syntax is: `{random:length:symbols}`, where `length` is an
+integer and `symbols` is one of:
+
+ * `d` for digits
+ * `l` for lowercase letters
+ * `L` for uppercase letters
+ * `symbols` might be ommited to use digits and letters
+
+### Assertions
+
+Assertion expressions have a syntax to do response fields querying. Let's shoot
+examples along with explanation.
+
+Status code of last query:
+
+    .status_code
+
+Take first query, its parsed json body, second array index, text property:
+
+    0.json.1.text
