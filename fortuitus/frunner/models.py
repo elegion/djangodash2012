@@ -1,3 +1,5 @@
+import logging
+
 from django.db import models
 from django.forms.models import model_to_dict
 from django.utils import timezone
@@ -9,6 +11,8 @@ from fortuitus.feditor.dbfields import ParamsField
 from fortuitus.feditor.models import TestProject
 from fortuitus.frunner.resolvers import (resolve_lhs, resolve_rhs,
                                          resolve_operator)
+
+logger = logging.getLogger(__name__)
 
 
 class TestResult:
@@ -38,6 +42,9 @@ class TestRun(models.Model):
     result = models.CharField(max_length=10, choices=TEST_CASE_RESULT_CHOICES,
                               blank=False, null=True)
 
+    def __unicode__(self):
+        return u'%s (%s)' % (self.project.name, self.base_url)
+
     @staticmethod
     def create_from_project(project):
         testrun = TestRun.objects.create(project=project,
@@ -58,6 +65,7 @@ class TestRun(models.Model):
         return testrun
 
     def run(self):
+        logger.info('Starting TestRun %s', self)
         self.start_date = timezone.now()
         self.save()
 
@@ -69,6 +77,7 @@ class TestRun(models.Model):
         self.end_date = timezone.now()
         self.result = self.result or TestResult.success
         self.save()
+        logger.info('Finished TestRun %s (result=%s)', self, self.result)
         return self.result
 
 
@@ -86,6 +95,7 @@ class TestCase(models_base.TestCase):
                               blank=False, null=True)
 
     def run(self, testrun):
+        logger.info('Starting TestCase %s', self)
         self.start_date = timezone.now()
 
         responses = []
@@ -93,8 +103,11 @@ class TestCase(models_base.TestCase):
             try:
                 response = step.run(testrun, self, responses)
                 if not response:
+                    logger.warn('TestCase %s received False response', self)
                     break
-            except Exception:
+            except Exception, e:
+                logger.error('TestCase %s exception: %s', self, e)
+                logger.error(e)
                 self.result = TestResult.error
                 break
         else:
@@ -103,6 +116,7 @@ class TestCase(models_base.TestCase):
         self.result = self.result or TestResult.fail
         self.end_date = timezone.now()
         self.save()
+        logger.info('Finished TestCase %s (result=%s)', self, self.result)
 
 
 class TestCaseStep(models_base.TestCaseStep):
@@ -124,18 +138,27 @@ class TestCaseStep(models_base.TestCaseStep):
     response_body = models.TextField(null=True, blank=True)
 
     def run(self, testrun, testcase, responses):
+        logger.info('Starting TestStep %s', self)
         self.start_date = timezone.now()
         try:
+            logger.info('Senging request: %s %s%s', self.method, testrun.base_url, self.url)
             r = requests.request(self.method,
                                  '%s%s' % (testrun.base_url, self.url))
 
+            logger.info('Received response: %s (headers: %s)', r.status_code, r.headers)
+            logger.debug('Response body: %s', r.text)
             self.response_code = r.status_code
             self.response_body = r.text
             self.response_headers = r.headers
 
             for assertion in self.assertions.all():
                 assertion.do_assertion(responses + [r])
+
+            logger.info('Finished TestStep %s (result=%s)', self, TestResult.success)
+            return r
         except Exception, e:
+            logger.error('Exception during TestStep %s: %s', self, e)
+            logger.error(e)
             self.exception = '%s: %s' % (e.__class__.__name__, str(e))
             if isinstance(e, AssertionError):
                 self.result = TestResult.fail
@@ -147,7 +170,6 @@ class TestCaseStep(models_base.TestCaseStep):
             self.end_date = timezone.now()
             self.result = self.result or TestResult.success
             self.save()
-        return r
 
 
 class TestCaseAssert(models_base.TestCaseAssert):
@@ -162,10 +184,13 @@ class TestCaseAssert(models_base.TestCaseAssert):
                               blank=False, null=True)
 
     def do_assertion(self, responses):
+        logger.info('Performing assertion: %s', self)
         lhs = resolve_lhs(self.lhs, responses)
         rhs = resolve_rhs(self.rhs, responses)
         operator = resolve_operator(self.operator)
         if not operator(unicode(lhs), unicode(rhs)):
+            logger.warn('Assertion failed: %s %s %s', lhs, self.operator, rhs)
             raise AssertionError('%s should be %s %s'
                                  % (lhs, self.operator, rhs))
+        logger.info('Assertion OK: %s %s %s', self.lhs, self.operator, self.rhs)
         return True

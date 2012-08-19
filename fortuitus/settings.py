@@ -134,6 +134,9 @@ LOGGING = {
     'filters': {
         'require_debug_false': {
             '()': 'django.utils.log.RequireDebugFalse'
+        },
+        'require_debug_true': {
+            '()': 'core.log.RequireDebugTrue'
         }
     },
     'handlers': {
@@ -141,7 +144,11 @@ LOGGING = {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
-        }
+        },
+        'console':{
+            'level':'DEBUG',
+            'class':'logging.StreamHandler',
+        },
     },
     'loggers': {
         'django.request': {
@@ -149,6 +156,11 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
+        'fortuitus.frunner.models': {
+            'handlers': ['console'],
+            'filters': ['require_debug_true'],
+            'level': 'DEBUG',
+        }
     }
 }
 

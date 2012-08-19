@@ -70,9 +70,6 @@ class TestCase(models_base.TestCase):
     class Meta():
         ordering = ('created',)
 
-    def __unicode__(self):
-        return self.name
-
 
 class TestCaseStep(models_base.TestCaseStep):
     """
@@ -81,9 +78,6 @@ class TestCaseStep(models_base.TestCaseStep):
     Contains info about test requests and multiple assertions.
     """
     testcase = models.ForeignKey(TestCase, related_name='steps')
-
-    def __unicode__(self):
-        return self.url
 
 
 class TestCaseAssert(models_base.TestCaseAssert):
