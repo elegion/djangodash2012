@@ -25,8 +25,8 @@ class ProfileTestCase(TestCase):
         Tests that second profile is created and not conflicted with the first
         user nor his profile.
         """
-        u1 = UserF.create()
+        u1 = UserF.create(username='u1')
         p1 = FortuitusProfile.objects.get(user_id=u1.pk)
-        u2 = UserF.create()
+        u2 = UserF.create(username='u2')
         p2 = FortuitusProfile.objects.get(user_id=u2.pk)
         self.assertNotEqual(p1, p2)
