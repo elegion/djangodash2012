@@ -216,15 +216,6 @@ class ResolversTestCase(TestCase):
         self.assertEqual(resolve_rhs('1.status_code', responses), 200)
 
 
-class OperatorsTestCase(TestCase):
-    def test_Eq(self):
-        from .operators import Eq
-        eq = Eq(1, 1)
-        self.assertTrue(eq.run())
-        eq = Eq(1, 2)
-        self.assertFalse(eq.run())
-
-
 class RunnerViewsTestCase(TestCase):
     def test_projects(self):
         """ Tests project list page is rendered properly. """
