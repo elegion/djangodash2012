@@ -46,6 +46,9 @@ class TestRun(models.Model):
     def __unicode__(self):
         return u'%s (%s)' % (self.project.name, self.base_url)
 
+    def result_str(self):
+        return self.result or TestResult.pending
+
     def human_name(self):
         return 'Run #%s (%s)' % (self.pk, self.result or TestResult.pending)
 

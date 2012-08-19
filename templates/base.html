@@ -5,12 +5,12 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>{% block pagetitle %}APITester{% endblock %}</title>
+    {% block favicon %}<link rel="icon" type="image/vnd.microsoft.icon" href="{{ STATIC_URL }}favicon.ico" />{% endblock %}
     {% compress css %}
     <link rel="stylesheet" href="{{ STATIC_URL }}css/lib/bootstrap/css/bootstrap.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}css/main.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}css/frunner.css">
     {% endcompress %}
-    <link rel="icon" type="image/vnd.microsoft.icon" href="{{ STATIC_URL }}favicon.ico" />
   </head>
   <body>
     {% block body %}{% endblock %}

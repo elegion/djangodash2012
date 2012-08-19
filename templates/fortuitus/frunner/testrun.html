@@ -2,6 +2,17 @@
 
 {% block pagetitle %}{{ testrun.human_name }} | {{ project.name }} | APITester{% endblock %}
 
+{% block favicon %}
+  {% if testrun.result_str == 'pending' %}
+    <link rel="icon" type="image/vnd.microsoft.icon" href="{{ STATIC_URL }}favicon_pending.ico" />
+  {% elif testrun.result_str == 'fail' or testrun.result_str == 'error' %}
+    <link rel="icon" type="image/vnd.microsoft.icon" href="{{ STATIC_URL }}favicon_fail.ico" />
+  {% else %}
+    {{ testrun.result_str }}
+    {{ block.super }}
+  {% endif %}
+{% endblock %}
+
 {% block content %}
   <div class="row-fluid">
     <div class="span2 sidebar">
