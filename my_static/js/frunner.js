@@ -44,8 +44,6 @@ Fortuitus.frunner = {
    */
   _updateTestProgress: function() {
     $.getJSON(document.location, {'html': Fortuitus.frunner._progress_need_html}, function(data) {
-      console.log(data);
-
       // Update current testcase results, if finished
       if (data.html) {
         Fortuitus.frunner._progress_need_html = undefined;
@@ -55,7 +53,6 @@ Fortuitus.frunner = {
       // Update sidebar's testcases statuses
       for (var key in data.testcase_statuses) {
         if (data.testcase_statuses.hasOwnProperty(key)) {
-          console.log(key, data.testcase_statuses[key])
           $('.js-testcase-list-' + key)
               .removeClass('result-pending result-success result-error result-fail result-')
               .addClass('result-' + data.testcase_statuses[key]);
