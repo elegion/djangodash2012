@@ -1,14 +1,6 @@
 from celery import task
-from django.forms.models import model_to_dict
 
-from fortuitus.feditor import models as emodels
 from fortuitus.frunner import models as rmodels
-
-
-@task()
-def add(x, y):
-    """ Test task. """
-    return x + y
 
 
 @task()
