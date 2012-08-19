@@ -55,20 +55,35 @@ Fortuitus.initEditTestStep = function() {
 };
 
 Fortuitus.initEditAssert = function() {
+    function startEdit($this) {
+        $('.js-assert-help').show();
+        $this.find('.js_edit').show();
+        $this.find('.js_show').hide();
+        $this.find('.js-btn-save-assert').show();
+        $this.find('.js-btn-delete-assert').show();
+        $this.find('.js-btn-delete-assert').show();
+        $this.find('.js-btn-cancel-edit-assert').show();
+        $this.find('.js-btn-edit-assert').hide();
+    }
+    function cancelEdit($this) {
+        $('.js-assert-help').show();
+        $this.find('.js_edit').hide();
+        $this.find('.js_show').show();
+        $this.find('.js-btn-save-assert').hide();
+        $this.find('.js-btn-delete-assert').hide();
+        $this.find('.js-btn-cancel-edit-assert').hide();
+        $this.find('.js-btn-edit-assert').show();
+    }
     $('.edit-assert-form').each( function() {
         var $this = $(this);
-        var btn = $('<button class="btn btn-mini btn-edit-assert"><i class="icon-pencil"></i></button>');
-        btn.click(function() {
-            $('.js-assert-help').show();
-            $this.find('.js_edit').show();
-            $this.find('.js_show').hide();
-            $this.find('.js-btn-save-assert').show();
-            $this.find('.js-btn-delete-assert').show();
-            btn.hide();
+        $('.js-btn-edit-assert', $this).click(function() {
+            startEdit($this);
             return false;
         });
-
-        $this.append(btn);
+        $('.js-btn-cancel-edit-assert', $this).click(function() {
+            cancelEdit($this);
+            return false;
+        });
     });
 
 

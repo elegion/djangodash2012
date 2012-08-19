@@ -70,7 +70,7 @@
     </li>
     {% for assert in step.assertions.all %}
       <li class="assert">
-        <form method="post" class="edit-assert-form form-inline">
+        <form method="post" class="assert-form edit-assert-form form-inline">
           {% csrf_token %}
           <input type="hidden" name="assert" value="{{ assert.pk }}">
 
@@ -80,10 +80,15 @@
           <span class="operator">{{ assert.get_operator_display }}</span>
           <span class="rhs js_show">{{ assert.rhs }}</span>
           <input type="text" name="rhs" value="{{ assert.rhs }}" class="js_edit" style="display:none">
-          <button class="btn btn-primary js-btn-save-assert btn-save-assert"
-            name="action" value="save_assert" style="display:none">Save</button>
-          <button class="btn btn-delete js-btn-delete-assert btn-save-assert"
-            name="action" value="delete_assert" style="display:none">Delete</button>
+          <button class="btn btn-mini btn-edit-assert js-btn-edit-assert"><i class="icon-pencil"></i></button>
+          <div class="form-action">
+            <button class="btn btn-primary js-btn-save-assert btn-save-assert"
+              name="action" value="save_assert" style="display:none">Save</button>
+            <button class="btn btn-danger js-btn-delete-assert btn-delete-assert"
+              name="action" value="delete_assert" style="display:none">Delete</button>
+            <button class="btn js-btn-cancel-edit-assert btn-cancel-edit-assert"
+              name="action" style="display:none">Cancel</button>
+          </div>
         </form>
       </li>
     {% endfor %}
@@ -115,14 +120,16 @@
   <button class="btn btn-cancel-add">Cancel</button>
 </form>
 
-<form method="post" class="js-add-assert-form add-assert-form form-inline" style="display: none">
+<form method="post" class="js-add-assert-form assert-form add-assert-form form-inline" style="display: none">
   {% csrf_token %}
   <i class="icon-ok-sign-big"></i>
   <span class="lhs"><input type="text" name="lhs"></span>
   <span class="operator">=<input type="hidden" name="operator" value="eq"></span>
   <span class="rhs"><input type="text" name="rhs"></span>
-  <button class="btn btn-primary js-btn-save-assert" name="action" value="add_assertion">Add</button>
-  <button class="btn js-btn-cancel-assert">Cancel</button>
+  <div class="form-action">
+    <button class="btn btn-primary js-btn-save-assert" name="action" value="add_assertion">Add</button>
+    <button class="btn js-btn-cancel-assert">Cancel</button>
+  </div>
 </form>
 
 <p class="add-buttons">

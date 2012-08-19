@@ -261,14 +261,27 @@ h2 {
     margin: 0 10px 3px -7px;
 }
 
-.assert .operator, .add-assert-form .operator {
+.assert-form {
+
+}
+  .assert-form .form-action {
+    margin-top: 18px;
+  }
+  .assert-form .btn-delete-assert,
+  .assert-form .btn-cancel-edit-assert {
+    margin: 0 0 0 20px;
+  }
+
+.assert .operator,
+.add-assert-form .operator {
     font-size: 1.4em;
     padding: 0 0.5em;
 }
 .add-assert-form {
     margin: 4em 0 0 0;
 }
-    .add-assert-form .operator, .edit-assert-form .operator {
+    .add-assert-form .operator,
+    .edit-assert-form .operator {
         vertical-align: middle;
     }
 
