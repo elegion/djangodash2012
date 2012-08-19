@@ -1,8 +1,8 @@
 {% extends 'site_base.html' %}
 {% load bootstrap %}
-{% block pagetitle %}
-  {{ testcase.name }} | {{ testcase.project.name }} | API Tester
-{% endblock %}
+
+{% block pagetitle %}{{ testcase.name }} | {{ testcase.project.name }} | API Tester{% endblock %}
+
 {% block content %}
   <div class="row-fluid">
     <div class="span2 sidebar">
