@@ -1,9 +1,11 @@
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
+from django.utils import simplejson
 
 from fortuitus.fcore.models import Company
 from fortuitus.feditor.models import TestProject
-from fortuitus.frunner.models import TestRun
+from fortuitus.frunner.models import TestRun, TestResult
 from fortuitus.frunner.tasks import run_tests
 
 
@@ -41,12 +43,24 @@ def testrun(request, company_slug, project_slug, testrun_number,
                'project': project,
                'testrun': testrun,
                'testcase': testcase}
-    return TemplateResponse(request, 'fortuitus/frunner/testrun.html',
-                            context)
+    if request.is_ajax():
+        html = ''
+        if testcase and testcase.result_str() != TestResult.pending and request.GET.get('html'):
+            html = TemplateResponse(request, 'fortuitus/frunner/_testcase.html', context).rendered_content
+        return HttpResponse(simplejson.dumps({
+            'testrun_status': testrun.result_str(),
+            'testcase_status': testcase and testcase.result_str() or '',
+            'testcase_statuses': dict([(unicode(r.pk), r.result_str()) for r in testrun.testcases.all()]),
+            'html': html
+        }), mimetype='application/json')
+    else:
+        return TemplateResponse(request, 'fortuitus/frunner/testrun.html', context)
 
 
 # TODO: @require_POST (or render template with form on GET)
 def run_project(request, company_slug, project_slug):
+    """ Creates new TestRun, runs it in celery task, redirects to created TestRun page
+    """
     project = get_object_or_404(TestProject, slug=project_slug)
     testrun = TestRun.create_from_project(project)
     run_tests.delay(testrun.pk)

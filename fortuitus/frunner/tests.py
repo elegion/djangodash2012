@@ -2,7 +2,7 @@ import operator
 
 from django.core.urlresolvers import reverse
 from django.test import TestCase
-from django.utils import timezone
+from django.utils import timezone, simplejson
 import mock
 import requests
 
@@ -468,8 +468,8 @@ class RunnerViewsTestCase(TestCase):
         self.assertEqual(200, response.status_code)
         self.assertTemplateUsed('fortuitus/frunner/project_runs.html')
 
-    def test_test_case(self):
-        """ Tests project list page is rendered properly. """
+    def test_testrun(self):
+        """ Tests test run page is rendered properly. """
         project = efactories.TestProjectF.create()
         case = rfactories.TestCaseF.create(testrun__project=project)
         url = reverse('frunner_testrun',
@@ -480,7 +480,65 @@ class RunnerViewsTestCase(TestCase):
         self.assertEqual(200, response.status_code)
         self.assertTemplateUsed('fortuitus/frunner/testrun.html')
 
-    def test_run_project(self):
+    def test_testrun_ajax(self):
+        """ Test test run page can be called via ajax
+        Sample response:
+
+            {
+              'testrun_status': 'pending',
+              'testcase_status': 'success',
+              'testcase_statuses': {'1': 'success', '2': 'pending'},
+              'html': '<ol>....</ol>'
+            }
+        """
+        testrun = rfactories.TestRunF()
+        case1 = rfactories.TestCaseF(testrun=testrun, result=rmodels.TestResult.success)
+        case2 = rfactories.TestCaseF(testrun=testrun, result=rmodels.TestResult.pending)
+        url = reverse('frunner_testrun',
+                      kwargs={'company_slug': testrun.project.company.slug,
+                              'project_slug': testrun.project.slug,
+                              'testrun_number': case1.testrun.pk})
+        response = self.client.get(url, {'html': 1}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+        self.assertEqual('application/json', response['Content-Type'])
+        data = simplejson.loads(response.content)
+        self.assertEqual(4, len(data))
+        self.assertEqual(rmodels.TestResult.pending, data['testrun_status'])
+        self.assertEqual(rmodels.TestResult.success, data['testcase_status'])
+        self.assertDictEqual({unicode(case1.pk): rmodels.TestResult.success,
+                              unicode(case2.pk): rmodels.TestResult.pending},
+                             data['testcase_statuses'])
+        self.assertEqual(rmodels.TestResult.pending, data['testrun_status'])
+        self.assertEqual(rmodels.TestResult.pending, data['testrun_status'])
+        self.assertGreater(len(data['html']), 100)
+        self.assertIn(case1.name, data['html'])
+
+    def test_testrun_ajax_not_return_html(self):
+        """ testrun should not return HTML if test is incomplete, or there is no ?html=1 parameter
+        """
+        # Pending TestCase
+        testrun = rfactories.TestRunF()
+        case1 = rfactories.TestCaseF(testrun=testrun, result=rmodels.TestResult.pending)
+        url = reverse('frunner_testrun',
+                      kwargs={'company_slug': testrun.project.company.slug,
+                              'project_slug': testrun.project.slug,
+                              'testrun_number': case1.testrun.pk})
+
+        # Pending TestCase
+        response = self.client.get(url, {'html': 1}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual('application/json', response['Content-Type'])
+        data = simplejson.loads(response.content)
+        self.assertFalse(data['html'])
+
+        # No ?html parameter
+        case1.result = rmodels.TestResult.fail
+        case1.save()
+        response = self.client.get(url, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual('application/json', response['Content-Type'])
+        data = simplejson.loads(response.content)
+        self.assertFalse(data['html'])
+
+def test_run_project(self):
         case = efactories.TestCaseF.create()
         url = reverse('frunner_run_project',
                       kwargs={'company_slug': case.project.company.slug,
