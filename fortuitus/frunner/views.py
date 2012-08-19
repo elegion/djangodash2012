@@ -1,8 +1,9 @@
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 
 from fortuitus.feditor.models import TestProject
 from fortuitus.frunner.models import TestRun
+from fortuitus.frunner.tasks import run_tests
 
 
 def projects(request):
@@ -39,3 +40,11 @@ def testrun(request, project_id, testrun_id):
                'test_case': testrun}
     return TemplateResponse(request, 'fortuitus/frunner/testrun.html',
                             context)
+
+
+# TODO: @require_POST (or render template with form on GET)
+def run_project(request, project_id):
+    project = get_object_or_404(TestProject, pk=project_id)
+    testrun = TestRun.create_from_project(project)
+    run_tests.delay(testrun.pk)
+    return redirect('frunner_testrun', project_id=testrun.project_id, testrun_id=testrun.pk)

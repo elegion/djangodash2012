@@ -475,3 +475,15 @@ class RunnerViewsTestCase(TestCase):
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
         self.assertTemplateUsed('fortuitus/frunner/testrun.html')
+
+    def test_run_project(self):
+        case = efactories.TestCaseF.create()
+        url = reverse('frunner_run_project',
+                      kwargs={'project_id': case.project_id})
+        self.assertEqual(0, rmodels.TestRun.objects.count())
+
+        response = self.client.post(url)
+
+        self.assertEqual(1, rmodels.TestRun.objects.count())
+        self.assertRedirects(response, reverse('frunner_testrun', args=[case.project_id,
+                                                                        rmodels.TestRun.objects.all()[0].pk]))

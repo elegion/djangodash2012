@@ -55,7 +55,7 @@ class TestRun(models.Model):
                 for assertion in estep.assertions.all():
                     kwargs = model_to_dict(assertion, exclude=['id', 'step'])
                     TestCaseAssert.objects.create(step=rstep, **kwargs)
-
+        return testrun
 
     def run(self):
         for testcase in self.testcases.all():
