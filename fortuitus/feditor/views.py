@@ -1,7 +1,7 @@
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
-from fortuitus.fcore.models import Company
+
 from fortuitus.feditor.forms import TestCaseForm
 from fortuitus.feditor.models import TestProject, TestCase, TestCaseStep
 from fortuitus.feditor.params import Params
@@ -9,12 +9,15 @@ from fortuitus.feditor.rights import can_edit_project
 
 
 def project(request, company, project):
-    project = get_object_or_404(TestProject, company__slug=company, slug=project)
+    """ Project page view. """
+    project = get_object_or_404(TestProject, company__slug=company,
+                                slug=project)
     testcases = project.testcases.all()
 
     testcase = None
     if request.GET.get('testcase'):
-        testcase = get_object_or_404(TestCase, project=project, slug=request.GET.get('testcase'))
+        testcase = get_object_or_404(TestCase, project=project,
+                                     slug=request.GET.get('testcase'))
     elif testcases:
         testcase = testcases[0]
 
@@ -25,7 +28,8 @@ def project(request, company, project):
             return HttpResponseForbidden()
 
         if request.POST.get('action') == 'add_testcase':
-            tc = TestCase.objects.create(name=TestCase.objects.get_unique_new_name(), project=project)
+            name = TestCase.objects.get_unique_new_name()
+            tc = TestCase.objects.create(name=name, project=project)
             return redirect(request.path + '?testcase=%s' % tc.slug)
 
         if request.POST.get('action') == 'delete_testcase':
@@ -59,7 +63,9 @@ def project(request, company, project):
 
 
 def testcase(request, company, project, test):
-    testcase = get_object_or_404(TestCase, project__company__slug=company, project__slug=project, slug=test)
+    """ TestCase page view. """
+    testcase = get_object_or_404(TestCase, project__company__slug=company,
+                                 project__slug=project, slug=test)
     data = {
         'testcase': testcase
     }
