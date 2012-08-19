@@ -16,6 +16,7 @@ class TestCaseF(factory.Factory):
     testrun = factory.SubFactory(TestRunF)
     name = factory.Sequence(lambda n: 'TestCase #%s' % n)
     order = 1
+    login_type = models.models_base.LoginType.NONE
 
 
 class TestCaseStepF(factory.Factory):
