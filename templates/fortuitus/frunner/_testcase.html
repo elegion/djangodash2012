@@ -32,7 +32,7 @@
           </table>
         </div>
       {% endif %}
-      {% if step.exception %}<div class="alert alert-error">{{ step.exception }}</div>{% endif %}
+      {% if step.exception and step.result_str != 'fail' %}<div class="alert alert-error">{{ step.exception }}</div>{% endif %}
       {% if step.response_code %}
         <div class="response-header">
           <span class="method">{{ step.response_code }}</span>
@@ -67,5 +67,20 @@
         </div>
       {% endif %}
     </div></li>
+    {% for assert in step.assertions.all %}
+      <li class="assert result-{{ assert.result_str }}"><div class="teststep-wrapper">
+        {% if assert.result_str == 'success' %}
+          <i class=" icon-assert-ok"></i>
+        {% elif assert.result_str == 'fail' %}
+          <i class=" icon-assert-fail"></i>
+        {% else %}
+          <i class="icon-ok-sign-big"></i>
+        {% endif %}
+        <span class="lhs">{{ assert.lhs }}</span>
+        <span class="operator">{{ assert.get_operator_display }}</span>
+        <span class="rhs">{{ assert.rhs }}</span>
+      </div></li>
+    {% endfor %}
+
   {% endfor %}
 </ol>

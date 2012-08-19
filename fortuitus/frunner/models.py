@@ -276,6 +276,9 @@ class TestCaseAssert(models_base.TestCaseAssert):
     result = models.CharField(max_length=10, choices=TEST_CASE_RESULT_CHOICES,
                               blank=False, null=True)
 
+    def result_str(self):
+        return self.result or TestResult.pending
+
     def do_assertion(self, responses):
         logger.info('Performing assertion: %s', self)
         lhs = resolve_lhs(self.lhs, responses)
@@ -283,7 +286,11 @@ class TestCaseAssert(models_base.TestCaseAssert):
         operator = resolve_operator(self.operator)
         if not operator(unicode(lhs), unicode(rhs)):
             logger.warn('Assertion failed: %s %s %s', lhs, self.operator, rhs)
+            self.result = TestResult.fail
+            self.save()
             raise AssertionError('%s should be %s %s'
                                  % (lhs, self.operator, rhs))
+        self.result = TestResult.success
+        self.save()
         logger.info('Assertion OK: %s %s %s', self.lhs, self.operator, self.rhs)
         return True
