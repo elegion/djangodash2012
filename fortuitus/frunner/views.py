@@ -18,11 +18,11 @@ def projects(request):
                             context)
 
 
-def project_runs(request, project_id):
+def project_runs(request, project_slug):
     """
     Lists all test runs for project.
     """
-    project = get_object_or_404(TestProject, pk=project_id)
+    project = get_object_or_404(TestProject, slug=project_slug)
     runs = project.test_runs.all()
     context = {'project': project,
                'runs': runs}
@@ -52,8 +52,8 @@ def testrun(request, project_slug, testrun_number, testcase_slug=None):
 
 
 # TODO: @require_POST (or render template with form on GET)
-def run_project(request, project_id):
-    project = get_object_or_404(TestProject, pk=project_id)
+def run_project(request, project_slug):
+    project = get_object_or_404(TestProject, slug=project_slug)
     testrun = TestRun.create_from_project(project)
     run_tests.delay(testrun.pk)
-    return redirect('frunner_testrun', project_id=testrun.project_id, testrun_id=testrun.pk)
+    return redirect('frunner_testrun', project_slug=project.slug, testrun_number=testrun.pk)

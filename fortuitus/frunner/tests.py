@@ -467,7 +467,7 @@ class RunnerViewsTestCase(TestCase):
         """ Tests project list page is rendered properly. """
         project = efactories.TestProjectF.create()
         url = reverse('frunner_project_runs',
-                      kwargs={'project_id': project.id})
+                      kwargs={'project_slug': project.slug})
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
         self.assertTemplateUsed('fortuitus/frunner/project_runs.html')
@@ -475,10 +475,10 @@ class RunnerViewsTestCase(TestCase):
     def test_test_case(self):
         """ Tests project list page is rendered properly. """
         project = efactories.TestProjectF.create()
-        case = rfactories.TestCaseF.create()
+        case = rfactories.TestCaseF.create(testrun__project=project)
         url = reverse('frunner_testrun',
-                      kwargs={'project_id': project.pk,
-                              'testrun_id': case.testrun_id})
+                      kwargs={'project_slug': project.slug,
+                              'testrun_number': case.testrun.pk})
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
         self.assertTemplateUsed('fortuitus/frunner/testrun.html')
@@ -486,14 +486,14 @@ class RunnerViewsTestCase(TestCase):
     def test_run_project(self):
         case = efactories.TestCaseF.create()
         url = reverse('frunner_run_project',
-                      kwargs={'project_id': case.project_id})
+                      kwargs={'project_slug': case.project.slug})
         self.assertEqual(0, rmodels.TestRun.objects.count())
 
         response = self.client.post(url)
 
         self.assertEqual(1, rmodels.TestRun.objects.count())
-        self.assertRedirects(response, reverse('frunner_testrun', args=[case.project_id,
-                                                                        rmodels.TestRun.objects.all()[0].pk]))
+        self.assertRedirects(response, reverse('frunner_testrun', kwargs={'project_slug': case.project.slug,
+                                                                          'testrun_number': rmodels.TestRun.objects.all()[0].pk}))
 
 
 class RegressionTestCase(BaseTestCase):

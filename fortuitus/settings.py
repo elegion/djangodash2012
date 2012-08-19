@@ -1,5 +1,6 @@
 # Django settings for fortuitus project.
 import os
+import re
 from django.core.urlresolvers import reverse_lazy
 
 WORKDIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -186,7 +187,9 @@ djcelery.setup_loader()
 BROKER_URL = 'django://'
 
 from unidecode import unidecode
-AUTOSLUG_SLUGIFY_FUNCTION = lambda s: unidecode(s.lower()).replace(' ', '-').replace('_', '-')
+def SLUGIFY_FUNCTION(s):
+    return re.sub('[^\w\s-]', '', unidecode(s.lower()).replace(' ', '-').replace('_', '-'))
+AUTOSLUG_SLUGIFY_FUNCTION = SLUGIFY_FUNCTION
 
 
 try:
