@@ -1,4 +1,5 @@
 from django.contrib import messages, auth
+from django.contrib.auth.models import User
 from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 from django.views.generic.base import TemplateView
@@ -33,5 +34,13 @@ def signup(request):
 
 def demo(request):
     """ Demo mode. Automatically sign in demo user and show 'em dashboard. """
-    # TODO autologin
+    if request.user.is_anonymous():
+        params = dict(username='demo', password='demo')
+        # We can't use get_or_create because we have to use `create_user`.
+        try:
+            user = User.objects.get(username=params['username'])
+        except User.DoesNotExist:
+            user = User.objects.create_user(**params)
+        user = auth.authenticate(**params)
+        auth.login(request, user)
     return redirect('feditor_project', company='demo', project='twitter')
