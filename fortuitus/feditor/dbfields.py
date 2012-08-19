@@ -20,7 +20,7 @@ class ParamsField(models.TextField):
             return value
         else:
             if not value:
-                return value
+                return Params()
             return Params.loads(value)
 
     def get_prep_value(self, value):
