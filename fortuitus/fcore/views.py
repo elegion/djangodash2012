@@ -4,6 +4,7 @@ from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 
 from fortuitus.fcore import forms
+from fortuitus.fcore.models import Company
 
 
 def home(request):
@@ -40,6 +41,10 @@ def demo(request):
             user = User.objects.get(username=params['username'])
         except User.DoesNotExist:
             user = User.objects.create_user(**params)
+            company, _ = Company.objects.get_or_create(
+                slug='demo', defaults={'name': 'demo'})
+            user.fortuitusprofile.company = company
+            user.fortuitusprofile.save()
         user = auth.authenticate(**params)
         auth.login(request, user)
     return redirect('feditor_project', company='demo', project='twitter')
