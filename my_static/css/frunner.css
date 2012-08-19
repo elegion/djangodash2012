@@ -95,3 +95,9 @@
   .teststeps-results .response-wrapper {
     display: none;
   }
+
+  .teststeps-results .assert .assert-values {
+    padding: 0 0 0 30px;
+    font-size:80%;
+    color: #999;
+  }

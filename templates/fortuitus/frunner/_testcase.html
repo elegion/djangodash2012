@@ -76,9 +76,16 @@
         {% else %}
           <i class="icon-ok-sign-big"></i>
         {% endif %}
-        <span class="lhs">{{ assert.lhs }}</span>
-        <span class="operator">{{ assert.get_operator_display }}</span>
-        <span class="rhs">{{ assert.rhs }}</span>
+          <span class="lhs">{{ assert.lhs }}</span>
+          <span class="operator">{{ assert.get_operator_display }}</span>
+          <span class="rhs">{{ assert.rhs }}</span>
+        {% if assert.lhs_value or assert.rhs_value %}
+          <div class="assert-values">
+            <span class="lhs">{{ assert.lhs_value }}</span>
+            <span class="operator">{{ assert.get_operator_display }}</span>
+            <span class="rhs">{{ assert.rhs_value }}</span>
+          </div>
+        {% endif %}
       </div></li>
     {% endfor %}
 

@@ -275,6 +275,8 @@ class TestCaseAssert(models_base.TestCaseAssert):
     """
     step = models.ForeignKey(TestCaseStep, related_name='assertions')
 
+    lhs_value = models.CharField(max_length=256, default='')
+    rhs_value = models.CharField(max_length=256, default='')
     result = models.CharField(max_length=10, choices=TEST_CASE_RESULT_CHOICES,
                               blank=False, null=True)
 
@@ -283,15 +285,15 @@ class TestCaseAssert(models_base.TestCaseAssert):
 
     def do_assertion(self, responses):
         logger.info('Performing assertion: %s', self)
-        lhs = resolve_lhs(self.lhs, responses)
-        rhs = resolve_rhs(self.rhs, responses)
+        self.lhs_value = unicode(resolve_lhs(self.lhs, responses))
+        self.rhs_value = unicode(resolve_rhs(self.rhs, responses))
         operator = resolve_operator(self.operator)
-        if not operator(unicode(lhs), unicode(rhs)):
-            logger.warn('Assertion failed: %s %s %s', lhs, self.operator, rhs)
+        if not operator(self.lhs_value, self.rhs_value):
+            logger.warn('Assertion failed: %s %s %s', self.lhs_value, self.operator, self.rhs_value)
             self.result = TestResult.fail
             self.save()
             raise AssertionError('%s should be %s %s'
-                                 % (lhs, self.operator, rhs))
+                                 % (self.lhs_value, self.operator, self.rhs_value))
         self.result = TestResult.success
         self.save()
         logger.info('Assertion OK: %s %s %s', self.lhs, self.operator, self.rhs)
