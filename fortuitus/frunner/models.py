@@ -5,6 +5,7 @@ from django.forms.models import model_to_dict
 from django.utils import timezone
 from furl import furl
 from jsonfield import JSONField
+from oauth_hook import OAuthHook
 import requests
 
 from fortuitus.feditor import models_base
@@ -99,11 +100,49 @@ class TestCase(models_base.TestCase):
         """ Runs the test case attached to :param testrun:. """
         logger.info('Starting TestCase %s', self)
         self.start_date = timezone.now()
+        try:
+            session = self.handle_auth()
+        except Exception as e:
+            self.result = TestResult.error
+            self.exception = '%s: %s' % (e.__class__.__name__, str(e))
+        else:
+            self.run_steps(testrun, self.steps.all(), session)
+        self.result = self.result or TestResult.fail
+        self.end_date = timezone.now()
+        self.save()
 
+    def handle_auth(self):
+        """ Handles test authentication. """
+        login = self.login_options
+        if self.login_type == models_base.LoginType.NONE:
+            session = requests.session()
+        elif self.login_type == models_base.LoginType.BASIC:
+            session = requests.session(auth=(login['user'], login['password']))
+        elif self.login_type == models_base.LoginType.COOKIE:
+            session = requests.session()
+            params = {login['login_field']: login['login'],
+                      login['password_field']: login['password']}
+            session.post(self.login_info['url'], params=params)
+        elif self.login_type == models_base.LoginType.OAUTH:
+            params = dict(access_token=login['access_token'],
+                          access_token_secret=login['access_token_secret'],
+                          consumer_key=login['consumer_key'],
+                          consumer_secret=login['consumer_secret'],
+                          header_auth=login.get('header_auth', True))
+            oauth_hook = OAuthHook(**params)
+            session = requests.session(hooks={'pre_request': oauth_hook})
+            logger.info('Attaching OAuth info.')
+        else:
+            raise NotImplementedError('%s login type not implemented' %
+                                      self.login_type)
+        return session
+
+    def run_steps(self, testrun, steps, session):
+        """ Runs test case steps. """
         responses = []
-        for step in self.steps.all():
+        for step in steps:
             try:
-                response = step.run(testrun, self, responses)
+                response = step.run(testrun, self, session, responses)
                 if response is False:
                     logger.warn('TestCase %s received False response', self)
                     break
@@ -139,7 +178,7 @@ class TestCaseStep(models_base.TestCaseStep):
     response_headers = JSONField(null=True, blank=True)
     response_body = models.TextField(null=True, blank=True)
 
-    def run(self, testrun, testcase, responses):
+    def run(self, testrun, testcase, session, responses):
         """ Runs test case step. """
         logger.info('Starting TestStep %s', self)
         self.start_date = timezone.now()
@@ -147,7 +186,7 @@ class TestCaseStep(models_base.TestCaseStep):
             url = furl(testrun.base_url)
             url.join(self.url)
             logger.info('Senging request: %s %s', self.method, url.url)
-            r = requests.request(self.method, url.url)
+            r = session.request(self.method, url.url)
 
             logger.info('Received response: %s (headers: %s)', r.status_code, r.headers)
             logger.debug('Response body: %s', r.text)

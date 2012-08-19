@@ -53,9 +53,10 @@ class IntegrationTestCase(BaseTestCase):
                 return ResponseF(content='Hello, world!')
             else:
                 raise AssertionError('Unexpected requests.request arguments: %s, %s' % (args, kwargs))
-        with mock.patch('requests.request', mock.Mock(side_effect=my_side_effect)):
+        with mock.patch('requests.sessions.Session.request',
+                        mock.Mock(side_effect=my_side_effect)):
             run_tests(testcase.testrun.pk)
-            self.assertEqual(2, requests.request.call_count)
+            self.assertEqual(2, requests.sessions.Session.request.call_count)
 
         self.assertEqual(1, rmodels.TestRun.objects.count())
         self.assertObject(rmodels.TestRun.objects.all()[0],
@@ -71,7 +72,8 @@ class IntegrationTestCase(BaseTestCase):
                           end_date__gte=start,
                           result=rmodels.TestResult.success)
 
-    @mock.patch('requests.request', mock.Mock(return_value=ResponseF(status_code=404, content='Wazup!')))
+    @mock.patch('requests.sessions.Session.request',
+                mock.Mock(return_value=ResponseF(status_code=404, content='Wazup!')))
     def test_run_tests2(self):
         """ Test cases should be failable
         """
@@ -88,7 +90,7 @@ class IntegrationTestCase(BaseTestCase):
 
         run_tests(testcase.testrun.pk)
 
-        self.assertEqual(1, requests.request.call_count)
+        self.assertEqual(1, requests.sessions.Session.request.call_count)
 
         self.assertEqual(1, rmodels.TestRun.objects.count())
         self.assertObject(rmodels.TestRun.objects.all()[0],
@@ -108,7 +110,7 @@ class IntegrationTestCase(BaseTestCase):
                           result=rmodels.TestResult.fail,
                           exception='AssertionError: 404 should be eq 200')
 
-    @mock.patch('requests.request', mock.Mock(side_effect=requests.Timeout('bad for you')))
+    @mock.patch('requests.sessions.Session.request', mock.Mock(side_effect=requests.Timeout('bad for you')))
     def test_run_tests3(self):
         """ Testcases can raise errors, and they are handled
         """
@@ -124,7 +126,7 @@ class IntegrationTestCase(BaseTestCase):
 
         run_tests(testcase.testrun.pk)
 
-        self.assertEqual(1, requests.request.call_count)
+        self.assertEqual(1, requests.sessions.Session.request.call_count)
 
         self.assertEqual(1, rmodels.TestCase.objects.count())
         self.assertObject(rmodels.TestCase.objects.all()[0],
@@ -276,7 +278,7 @@ class TestCaseStepModelTestCase(BaseTestCase):
         rfactories.TestCaseAssertF(step=step)
         rfactories.TestCaseAssertF(step=step)
 
-        res = step.run(step.testcase.testrun, step.testcase, [])
+        res = step.run(step.testcase.testrun, step.testcase, requests, [])
         requests.request.assert_called_once_with(step.method, '%s%s' % (step.testcase.testrun.base_url, step.url))
 
         self.assertEqual(3, rmodels.TestCaseAssert.do_assertion.call_count)
@@ -303,7 +305,7 @@ class TestCaseStepModelTestCase(BaseTestCase):
 
         step = rfactories.TestCaseStepF()
 
-        step.run(step.testcase.testrun, step.testcase, [])
+        step.run(step.testcase.testrun, step.testcase, requests, [])
 
         self.assertEqual(0, rmodels.TestCaseAssert.do_assertion.call_count)
 
@@ -322,7 +324,7 @@ class TestCaseStepModelTestCase(BaseTestCase):
         rfactories.TestCaseAssertF(step=step)
         rfactories.TestCaseAssertF(step=step)
 
-        res = step.run(step.testcase.testrun, step.testcase, [])
+        res = step.run(step.testcase.testrun, step.testcase, requests, [])
         self.assertFalse(res)
 
         self.assertEqual(1, rmodels.TestCaseAssert.do_assertion.call_count)
@@ -340,7 +342,7 @@ class TestCaseStepModelTestCase(BaseTestCase):
         rfactories.TestCaseAssertF(step=step)
 
         with self.assertRaises(requests.Timeout):
-            step.run(step.testcase.testrun, step.testcase, [])
+            step.run(step.testcase.testrun, step.testcase, requests, [])
 
         self.assertEqual(0, rmodels.TestCaseAssert.do_assertion.call_count)
 
