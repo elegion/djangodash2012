@@ -1,5 +1,5 @@
 <h2 class="testcase-header result-{{ testcase.result }}">
-  <span class="result-symbol">&bull;</span> {{ testcase.name }} ({{ testcase.start_date|default:'pending' }})
+  <span class="result-symbol">&bull;</span> {{ testcase.name }} ({{ testcase.start_date|date:"SHORT_DATETIME_FORMAT"|default:'pending' }})
 </h2>
 
 <ol class="teststeps teststeps-results">
