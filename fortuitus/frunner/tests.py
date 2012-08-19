@@ -391,15 +391,15 @@ class TestCaseStepModelTestCase(BaseTestCase):
                                                  params={})
 
 
-class TestCaseAssertTestCase(TestCase):
+class TestCaseAssertTestCase(BaseTestCase):
     def test_do_assertion(self):
         responses = [{'status_code': '404'}, {'status_code': '200'}]
-        a = rmodels.TestCaseAssert()
+        a = rfactories.TestCaseAssertF.create(lhs='0.status_code',
+                                              operator='eq',
+                                              rhs='404')
 
-        a.lhs = '0.status_code'
-        a.operator = 'eq'
-        a.rhs = '404'
         self.assertTrue(a.do_assertion(responses))
+        self.assertObjectUpdated(a, result=rmodels.TestResult.success)
 
         a.lhs = '.status_code'
         a.operator = 'eq'
@@ -407,6 +407,7 @@ class TestCaseAssertTestCase(TestCase):
         with self.assertRaises(AssertionError) as e:
             self.assertFalse(a.do_assertion(responses))
         self.assertEqual('200 should be eq 404', e.exception.message)
+        self.assertObjectUpdated(a, result=rmodels.TestResult.fail)
 
 
 class ResolversTestCase(TestCase):
