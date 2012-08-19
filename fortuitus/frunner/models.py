@@ -103,5 +103,5 @@ class TestCaseAssert(models_base.TestCaseAssert):
     def do_assertion(self, responses):
         lhs = resolve_lhs(self.lhs, responses)
         rhs = resolve_rhs(self.rhs, responses)
-        operator = resolve_operator(self.operator)(lhs, rhs)
-        return operator.run()
+        operator = resolve_operator(self.operator)
+        return operator(lhs, rhs)

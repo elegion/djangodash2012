@@ -15,7 +15,7 @@ class Method:
 
 
 method_choices = [(f, f) for f in dir(Method) if not f.startswith('_')]
-operator_choices = [('Eq', '=')]
+operator_choices = [('eq', '=')]
 
 
 class Params(models.Model):

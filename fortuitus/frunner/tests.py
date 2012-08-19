@@ -1,3 +1,5 @@
+import operator
+
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.utils import timezone
@@ -157,12 +159,12 @@ class TestCaseAssertTestCase(TestCase):
         a = rmodels.TestCaseAssert()
 
         a.lhs = '0.status_code'
-        a.operator = 'Eq'
+        a.operator = 'eq'
         a.rhs = '404'
         self.assertTrue(a.do_assertion(responses))
 
         a.lhs = '.status_code'
-        a.operator = 'Eq'
+        a.operator = 'eq'
         a.rhs = '404'
         self.assertFalse(a.do_assertion(responses))
 
@@ -170,17 +172,17 @@ class TestCaseAssertTestCase(TestCase):
 class ResolversTestCase(TestCase):
     def test_resolve_operator_short_name(self):
         """ Tests operator resolver with short operator name. """
-        from . import resolvers, operators
-        Op = resolvers.resolve_operator('Eq')
-        self.assertEqual(Op, operators.Eq)
+        from fortuitus.frunner import resolvers
+        op = resolvers.resolve_operator('eq')
+        self.assertEqual(op, operator.eq)
 
     def test_resolve_operator_full_name(self):
         """
         Tests operator resolver with full operator name, including module.
         """
-        from . import resolvers, operators
-        Op = resolvers.resolve_operator('fortuitus.frunner.operators.Eq')
-        self.assertEqual(Op, operators.Eq)
+        from fortuitus.frunner import resolvers
+        op = resolvers.resolve_operator('operator.lt')
+        self.assertEqual(op, operator.lt)
 
     def test_resolve_lhs_last_response(self):
         """ Test lhs resolver: last response, dictionary. """
