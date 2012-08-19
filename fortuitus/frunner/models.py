@@ -88,7 +88,7 @@ class TestCase(models_base.TestCase):
                 response = step.run(testrun, self, responses)
                 if not response:
                     break
-            except Exception, e:
+            except Exception:
                 self.result = TestResult.error
                 break
         else:
@@ -120,7 +120,8 @@ class TestCaseStep(models_base.TestCaseStep):
     def run(self, testrun, testcase, responses):
         self.start_date = timezone.now()
         try:
-            r = requests.request(self.method, '%s%s' % (testrun.base_url, self.url))
+            r = requests.request(self.method,
+                                 '%s%s' % (testrun.base_url, self.url))
 
             self.response_code = r.status_code
             self.response_body = r.text
@@ -159,5 +160,6 @@ class TestCaseAssert(models_base.TestCaseAssert):
         rhs = resolve_rhs(self.rhs, responses)
         operator = resolve_operator(self.operator)
         if not operator(unicode(lhs), unicode(rhs)):
-            raise AssertionError('%s should be %s %s' % (lhs, self.operator, rhs))
+            raise AssertionError('%s should be %s %s'
+                                 % (lhs, self.operator, rhs))
         return True
