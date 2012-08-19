@@ -1,10 +1,12 @@
 from django.contrib import messages, auth
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 
 from fortuitus.fcore import forms
 from fortuitus.fcore.models import Company
+from fortuitus.feditor import models as emodels
 
 
 def home(request):
@@ -47,4 +49,14 @@ def demo(request):
             user.fortuitusprofile.save()
         user = auth.authenticate(**params)
         auth.login(request, user)
-    return redirect('feditor_project', company='demo', project='twitter')
+    return redirect('fcore_projects_list', company_slug='demo')
+
+
+@login_required
+def projects_list(request, company_slug):
+    company = Company.objects.get(slug=company_slug)
+    projects = emodels.TestProject.objects.get_by_company(company)
+    context = dict(company=company,
+                   projects=projects)
+    return TemplateResponse(request, 'fortuitus/fcore/projects_list.html',
+                            context)

@@ -12,4 +12,7 @@ urlpatterns = patterns('',
         {'template_name': 'fortuitus/fcore/login.html'}, name='login'),
     url(r'^signup/$', views.signup, name='signup'),
     url(r'^demo/$', views.demo, name='demo'),
+
+    url(r'^(?P<company_slug>[\d\w_-]+)/projects/$', views.projects_list,
+        name='fcore_projects_list'),
 )

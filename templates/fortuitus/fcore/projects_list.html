@@ -1,0 +1,20 @@
+{% extends 'site_base.html' %}
+
+{% block title %}Projects | {{ company.name }} | {{ block.super }}{% endblock %}
+
+{% block content %}
+  <header class="subhead">
+    <h1>{{ company.name }}</h1>
+    <h2>Projects</h2>
+  </header>
+
+  <ul class="projects">
+    {% for project in projects %}
+      <li>
+        <a href="{% url frunner_project_runs project_slug=project.slug %}">
+          {{ project.name }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}
