@@ -30,8 +30,7 @@ TEST_CASE_RESULT_CHOICES = (
 
 
 class TestRun(models.Model):
-    """ Contains information about single project tests run
-    """
+    """ Contains information about single project tests run. """
     project = models.ForeignKey(TestProject, related_name='test_runs')
 
     base_url = models.URLField()
@@ -85,7 +84,7 @@ class TestCase(models_base.TestCase):
     """
     Contains information about actual test case run.
 
-    See also :model:`feditor.TestCase`
+    See also :model:`feditor.TestCase`.
     """
     testrun = models.ForeignKey(TestRun, related_name='testcases')
 
@@ -96,6 +95,7 @@ class TestCase(models_base.TestCase):
     exception = models.TextField(blank=True, null=True)
 
     def run(self, testrun):
+        """ Runs the test case attached to :param testrun:. """
         logger.info('Starting TestCase %s', self)
         self.start_date = timezone.now()
 
@@ -124,7 +124,7 @@ class TestCaseStep(models_base.TestCaseStep):
     """
     Contains information about test step run result.
 
-    See also :model:`feditor.TestCaseStep`
+    See also :model:`feditor.TestCaseStep`.
     """
     testcase = models.ForeignKey(TestCase, related_name='steps')
 
@@ -139,6 +139,7 @@ class TestCaseStep(models_base.TestCaseStep):
     response_body = models.TextField(null=True, blank=True)
 
     def run(self, testrun, testcase, responses):
+        """ Runs test case step. """
         logger.info('Starting TestStep %s', self)
         self.start_date = timezone.now()
         try:
@@ -175,9 +176,9 @@ class TestCaseStep(models_base.TestCaseStep):
 
 class TestCaseAssert(models_base.TestCaseAssert):
     """
-    Contains assertion result for TestCaseStep
+    Contains assertion result for TestCaseStep.
 
-    See also :model:`feditor.TestCaseAssert`
+    See also :model:`feditor.TestCaseAssert`.
     """
     step = models.ForeignKey(TestCaseStep, related_name='assertions')
 

@@ -140,8 +140,8 @@ class IntegrationTestCase(BaseTestCase):
 class TestRunModelTestCase(BaseTestCase):
     def test_create_from_project(self):
         """
-        Should copy TestProject and (and all related TestCases, TestCaseSteps, etc)
-        and return :model:`frunner.TestRun`
+        Should copy TestProject and (and all related TestCases, TestCaseSteps,
+        etc) and return :model:`frunner.TestRun`.
         """
         test_case = efactories.TestCaseF.create()
         step1 = efactories.TestCaseStepF.create(testcase=test_case)
@@ -263,8 +263,9 @@ class TestCaseStepModelTestCase(BaseTestCase):
     @mock.patch('fortuitus.frunner.models.TestCaseAssert.do_assertion', mock.Mock(return_value=False))
     @mock.patch('requests.request', mock.Mock(return_value=ResponseF()))
     def test_run_performs_request(self):
-        """ TestCase.run should perform request, saves result
-        then perform all assertions and return response on success
+        """
+        TestCase.run should perform request, saves result
+        then perform all assertions and return response on success.
         """
         start = timezone.now()
 
@@ -294,7 +295,9 @@ class TestCaseStepModelTestCase(BaseTestCase):
     @mock.patch('fortuitus.frunner.models.TestCaseAssert.do_assertion', mock.Mock())
     @mock.patch('requests.request', mock.Mock(return_value=ResponseF()))
     def test_run_without_assertions(self):
-        """ Test case step should be runnable without TestCaseAssertions (and should be success)
+        """
+        Test case step should be runnable without TestCaseAssertions (and
+        should be success).
         """
         start = timezone.now()
 
@@ -312,7 +315,8 @@ class TestCaseStepModelTestCase(BaseTestCase):
     @mock.patch('fortuitus.frunner.models.TestCaseAssert.do_assertion', mock.Mock(side_effect=AssertionError('qwer')))
     @mock.patch('requests.request', mock.Mock(return_value=ResponseF()))
     def test_run_saves_assertion_exceptions(self):
-        """ Test case step should save exceptions raised by assertion
+        """
+        Test case step should save exceptions raised by assertion
         """
         step = rfactories.TestCaseStepF()
         rfactories.TestCaseAssertF(step=step)
@@ -330,8 +334,7 @@ class TestCaseStepModelTestCase(BaseTestCase):
     @mock.patch('fortuitus.frunner.models.TestCaseAssert.do_assertion', mock.Mock(side_effect=AssertionError('qwer')))
     @mock.patch('requests.request', mock.Mock(side_effect=requests.Timeout('Timeout error')))
     def test_run_saves_requests_exception(self):
-        """ Test case should save exceptions thrown by requests.request
-        """
+        """ Test case should save exceptions thrown by requests.request. """
         step = rfactories.TestCaseStepF()
         rfactories.TestCaseAssertF(step=step)
         rfactories.TestCaseAssertF(step=step)
