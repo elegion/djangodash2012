@@ -47,6 +47,14 @@
                 </div>
             </form>
         </li>
+        {% for assert in step.assertions.all %}
+        <li class="assert">
+          <i class="icon-ok-sign-big"></i>
+          <span class="lhs">{{ assert.lhs }}</span>
+          <span class="operator">{{ assert.get_operator_display }}</span>
+          <span class="rhs">{{ assert.rhs }}</span>
+        </li>
+        {% endfor %}
     {% endfor %}
 </ol>
 
@@ -75,7 +83,17 @@
   <button class="btn btn-cancel-add">Cancel</button>
 </form>
 
+<form method="post" class="js-add-assert-form add-assert-form form-inline" style="display: none">
+  {% csrf_token %}
+  <i class="icon-ok-sign-big"></i>
+  <span class="lhs"><input type="text" name="lhs"></span>
+  <span class="operator">=<input type="hidden" name="operator" value="eq"></span>
+  <span class="rhs"><input type="text" name="rhs"></span>
+  <button class="btn btn-primary js-btn-save-assert" name="action" value="add_assertion">Add</button>
+  <button class="btn js-btn-cancel-assert">Cancel</button>
+</form>
+
 <p class="add-buttons">
 <button class="add-test btn">Add Query</button>
-<button class="add-assert btn">Add Assert</button>
+<button class="js-btn-add-assert add-assert btn">Add Assert</button>
 </p>

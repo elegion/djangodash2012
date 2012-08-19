@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 
 from fortuitus.feditor.forms import TestCaseForm
-from fortuitus.feditor.models import TestProject, TestCase, TestCaseStep
+from fortuitus.feditor.models import TestProject, TestCase, TestCaseStep, TestCaseAssert
 from fortuitus.feditor.models_base import method_choices
 from fortuitus.feditor.params import Params
 from fortuitus.feditor.rights import can_edit_project
@@ -65,6 +65,20 @@ def project(request, company, project):
 
         if request.POST.get('action') == 'delete_step':
             TestCaseStep.objects.filter(pk=request.POST.get('teststep')).delete()
+            return redirect(request.path + '?testcase=%s' % testcase.slug)
+
+        if request.POST.get('action') == 'add_assertion':
+            lhs = request.POST.get('lhs')
+            rhs = request.POST.get('rhs')
+            operator = request.POST.get('operator')
+            teststep = TestCaseStep.objects.filter(testcase=testcase).order_by('-order')[0]
+            order = TestCaseAssert.objects.filter(step=teststep).order_by('-order')
+            if order:
+                order = order[0].order + 1
+            else:
+                order = 1
+            TestCaseAssert.objects.create(step=teststep,
+                lhs=lhs, rhs=rhs, operator=operator, order=order)
             return redirect(request.path + '?testcase=%s' % testcase.slug)
 
         tc_form = TestCaseForm(request.POST, instance=testcase)

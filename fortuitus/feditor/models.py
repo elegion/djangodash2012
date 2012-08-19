@@ -79,6 +79,9 @@ class TestCaseStep(models_base.TestCaseStep):
     """
     testcase = models.ForeignKey(TestCase, related_name='steps')
 
+    class Meta():
+        ordering = ('order',)
+
 
 class TestCaseAssert(models_base.TestCaseAssert):
     """

@@ -51,3 +51,13 @@ Fortuitus.initEditTestStep = function() {
     });
 };
 
+Fortuitus.initEditAssert = function() {
+    $('.js-btn-add-assert').click(function(){
+        $('.js-add-assert-form').show();
+        return false;
+    });
+    $('.js-btn-cancel-assert').click(function(){
+        $('.js-add-assert-form').hide();
+        return false;
+    });
+}

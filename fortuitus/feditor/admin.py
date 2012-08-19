@@ -13,9 +13,9 @@ class TestCaseStepAdmin(admin.ModelAdmin):
     """ Test case steps administration. """
     inlines = [TestCaseAssertInline]
 
-    list_display = ('testcase', '__unicode__')
+    list_display = ('testcase', 'order', '__unicode__')
     list_display_links = ('__unicode__',)
-    list_filter = ('testcase',)
+    list_filter = ('testcase__project', 'testcase',)
 
 
 admin.site.register(TestProject)

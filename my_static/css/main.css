@@ -157,9 +157,12 @@ h2 {
             width: 30em;
             padding: 0 35px 0 0;
         }
-        .teststeps li .params {
-            margin-top: 0.7em;
+        .teststeps li .params, .add_step_form .params {
+            border-collapse: collapse;
         }
+            .teststeps .head {
+                padding-bottom: 0.5em;
+            }
             .teststeps li .params td.name {
                 width: 50%;
             }
@@ -211,3 +214,22 @@ h2 {
     .add_step_form h2 {
         margin: 0 0 0.5em 0;
     }
+.icon-ok-sign-big {
+    background: url(../imgs/icon-assert.png);
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+    margin: 0 10px 3px -7px;
+}
+
+.assert .operator, .add-assert-form .operator {
+    font-size: 1.4em;
+    padding: 0 0.5em;
+}
+.add-assert-form {
+    margin: 4em 0 0 0;
+}
+    .add-assert-form .operator {
+        vertical-align: middle;
+    }
+
