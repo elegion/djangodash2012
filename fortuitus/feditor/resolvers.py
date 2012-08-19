@@ -1,7 +1,8 @@
-import string
-from django.utils.importlib import import_module
-import re
 import random as sysrandom
+import re
+import string
+
+from django.utils.importlib import import_module
 
 
 PLACEHOLDER_REGEXP \
@@ -10,12 +11,22 @@ PLACEHOLDER_REGEXP \
 RESOLVERS = {
     'random': 'fortuitus.feditor.resolvers.random',
 }
+RANDOM_SYMBOLS = {
+    'd': string.digits,
+    'l': string.ascii_lowercase,
+    'L': string.ascii_uppercase,
+}
+
 
 def resolve_param(expr, context):
     """
-    Parameters are expressions.
+    Resolves parameter expressions.
 
-    ex. {random:3:d}@touchin.ru ==> 345@touchin.ru
+    Currently only random special form is supported.
+
+    Example::
+
+        {random:3:d}@touchin.ru ==> 345@touchin.ru
     """
     result = expr
     for ph in PLACEHOLDER_REGEXP.finditer(expr):
@@ -26,18 +37,15 @@ def resolve_param(expr, context):
             assert Exception('Wrong resolver')
         else:
             module = import_module('.'.join(resolver.split('.')[:-1]))
-            func = resolver.split('.')[-1]
-            result = result.replace(placeholder, getattr(module, func)(placeholder, params, context))
+            fn = resolver.split('.')[-1]
+            func = getattr(module, fn)
+            result = result.replace(placeholder,
+                                    func(placeholder, params, context))
     return result
 
 
-RANDOM_SYMBOLS = {
-    'd': string.digits,
-    'l': string.ascii_lowercase,
-    'L': string.ascii_uppercase,
-}
-
 def random(expr, params, context):
+    """ Generates random expression. """
     length = 5
     symbols = 'dL'
     if len(params) > 0:
