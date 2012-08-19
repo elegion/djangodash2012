@@ -91,6 +91,90 @@ class RunTestsTaskTestCase(BaseTestCase):
         rmodels.TestCase.run.assert_has_calls([mock.call(), mock.call()])
 
 
+class IntegrationTestCase(BaseTestCase):
+    def test_run_tests(self):
+        """ Testcases should be passable
+        """
+        start = timezone.now()
+
+        testcase = efactories.TestCaseF.create()
+        step1 = efactories.TestCaseStepF.create(testcase=testcase)
+        step2 = efactories.TestCaseStepF.create(testcase=testcase, url='groups.json')
+        efactories.TestCaseAssertF.create(step=step2, lhs='.status_code', rhs='200', operator='eq')
+        efactories.TestCaseAssertF.create(step=step2, lhs='.text', rhs='Hello, world!', operator='eq')
+
+        def my_side_effect(*args, **kwargs):
+            if args[0] == 'GET' and args[1] == '%s%s' % (testcase.project.base_url, step1.url):
+                return ResponseF()
+            elif args[0] == 'GET' and args[1] == '%s%s' % (testcase.project.base_url, step2.url):
+                return ResponseF(content='Hello, world!')
+            else:
+                raise AssertionError('Unexpected requests.request arguments: %s, %s' % (args, kwargs))
+        with mock.patch('requests.request', mock.Mock(side_effect=my_side_effect)):
+            run_tests(testcase.pk)
+            self.assertEqual(2, requests.request.call_count)
+
+        self.assertEqual(1, rmodels.TestCase.objects.count())
+        self.assertObject(rmodels.TestCase.objects.all()[0],
+                          start_date__gte=start,
+                          end_date__gte=start,
+                          result=rmodels.TestResult.success)
+
+    @mock.patch('requests.request', mock.Mock(return_value=ResponseF(status_code=404, content='Wazup!')))
+    def test_run_tests2(self):
+        """ Test cases should be failable
+        """
+        start = timezone.now()
+
+        testcase = efactories.TestCaseF.create()
+        step1 = efactories.TestCaseStepF.create(testcase=testcase, order=1)
+        efactories.TestCaseAssertF.create(step=step1, lhs='.text', rhs='Wazup!', operator='eq', order=1)
+        efactories.TestCaseAssertF.create(step=step1, lhs='.status_code', rhs='200', operator='eq', order=2)
+        step2 = efactories.TestCaseStepF.create(testcase=testcase, url='groups.json', order=2)
+        efactories.TestCaseAssertF.create(step=step2, lhs='.status_code', rhs='200', operator='eq')
+        efactories.TestCaseAssertF.create(step=step2, lhs='.text', rhs='Hello, world!', operator='eq')
+
+        run_tests(testcase.pk)
+
+        self.assertEqual(1, requests.request.call_count)
+
+        self.assertEqual(1, rmodels.TestCase.objects.count())
+        self.assertObject(rmodels.TestCase.objects.all()[0],
+                          start_date__gte=start,
+                          end_date__gte=start,
+                          result=rmodels.TestResult.fail)
+        self.assertEqual(2, rmodels.TestCaseStep.objects.count())
+        self.assertObject(rmodels.TestCaseStep.objects.all()[0],
+                          result=rmodels.TestResult.fail,
+                          exception='AssertionError: 404 should be eq 200')
+
+    @mock.patch('requests.request', mock.Mock(side_effect=requests.Timeout('bad for you')))
+    def test_run_tests3(self):
+        start = timezone.now()
+
+        testcase = efactories.TestCaseF.create()
+        step1 = efactories.TestCaseStepF.create(testcase=testcase, order=1)
+        efactories.TestCaseAssertF.create(step=step1, lhs='.text', rhs='Wazup!', operator='eq', order=1)
+        efactories.TestCaseAssertF.create(step=step1, lhs='.status_code', rhs='200', operator='eq', order=2)
+        step2 = efactories.TestCaseStepF.create(testcase=testcase, url='groups.json', order=2)
+        efactories.TestCaseAssertF.create(step=step2, lhs='.status_code', rhs='200', operator='eq')
+        efactories.TestCaseAssertF.create(step=step2, lhs='.text', rhs='Hello, world!', operator='eq')
+
+        run_tests(testcase.pk)
+
+        self.assertEqual(1, requests.request.call_count)
+
+        self.assertEqual(1, rmodels.TestCase.objects.count())
+        self.assertObject(rmodels.TestCase.objects.all()[0],
+            start_date__gte=start,
+            end_date__gte=start,
+            result=rmodels.TestResult.error)
+        self.assertEqual(2, rmodels.TestCaseStep.objects.count())
+        self.assertObject(rmodels.TestCaseStep.objects.all()[0],
+            result=rmodels.TestResult.error,
+            exception='Timeout: bad for you')
+
+
 class TestCaseModelTestCase(BaseTestCase):
     @mock.patch('fortuitus.frunner.models.TestCaseStep.run', mock.Mock(return_value=True))
     def test_run_runs_all_test_steps(self):
@@ -186,8 +270,8 @@ class TestCaseStepModelTestCase(BaseTestCase):
         rfactories.TestCaseAssertF(step=step)
         rfactories.TestCaseAssertF(step=step)
 
-        res = step.run([])
-        requests.request.assert_called_once_with(step.method, step.url)
+        res = step.run(step.testcase.project, step.testcase, [])
+        requests.request.assert_called_once_with(step.method, '%s%s' % (step.testcase.project.base_url, step.url))
 
         self.assertEqual(3, rmodels.TestCaseAssert.do_assertion.call_count)
         rmodels.TestCaseAssert.do_assertion.assert_called_with([response])
@@ -211,7 +295,7 @@ class TestCaseStepModelTestCase(BaseTestCase):
 
         step = rfactories.TestCaseStepF()
 
-        step.run([])
+        step.run(step.testcase.project, step.testcase, [])
 
         self.assertEqual(0, rmodels.TestCaseAssert.do_assertion.call_count)
 
@@ -229,8 +313,8 @@ class TestCaseStepModelTestCase(BaseTestCase):
         rfactories.TestCaseAssertF(step=step)
         rfactories.TestCaseAssertF(step=step)
 
-        with self.assertRaises(AssertionError):
-            step.run([])
+        res = step.run(step.testcase.project, step.testcase, [])
+        self.assertFalse(res)
 
         self.assertEqual(1, rmodels.TestCaseAssert.do_assertion.call_count)
 
@@ -248,7 +332,7 @@ class TestCaseStepModelTestCase(BaseTestCase):
         rfactories.TestCaseAssertF(step=step)
 
         with self.assertRaises(requests.Timeout):
-            step.run([])
+            step.run(step.testcase.project, step.testcase, [])
 
         self.assertEqual(0, rmodels.TestCaseAssert.do_assertion.call_count)
 
@@ -273,7 +357,9 @@ class TestCaseAssertTestCase(TestCase):
         a.lhs = '.status_code'
         a.operator = 'eq'
         a.rhs = '404'
-        self.assertFalse(a.do_assertion(responses))
+        with self.assertRaises(AssertionError) as e:
+            self.assertFalse(a.do_assertion(responses))
+        self.assertEqual('200 should be eq 404', e.exception.message)
 
 
 class ResolversTestCase(TestCase):

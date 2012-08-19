@@ -42,7 +42,7 @@ class TestCase(models_base.TestCase):
         responses = []
         for step in self.steps.all():
             try:
-                response = step.run(responses)
+                response = step.run(self.project, self, responses)
                 if not response:
                     break
             except Exception, e:
@@ -79,10 +79,10 @@ class TestCaseStep(models_base.TestCaseStep):
     response_headers = JSONField(null=True, blank=True)
     response_body = models.TextField(null=True, blank=True)
 
-    def run(self, responses):
+    def run(self, project, testcase, responses):
         self.start_date = timezone.now()
         try:
-            r = requests.request(self.method, self.url)
+            r = requests.request(self.method, '%s%s' % (project.base_url, self.url))
 
             self.response_code = r.status_code
             self.response_body = r.text
@@ -94,9 +94,10 @@ class TestCaseStep(models_base.TestCaseStep):
             self.exception = '%s: %s' % (e.__class__.__name__, str(e))
             if isinstance(e, AssertionError):
                 self.result = TestResult.fail
+                return False
             else:
                 self.result = TestResult.error
-            raise
+                raise
         finally:
             self.end_date = timezone.now()
             self.result = self.result or TestResult.success
@@ -119,4 +120,6 @@ class TestCaseAssert(models_base.TestCaseAssert):
         lhs = resolve_lhs(self.lhs, responses)
         rhs = resolve_rhs(self.rhs, responses)
         operator = resolve_operator(self.operator)
-        return operator(lhs, rhs)
+        if not operator(unicode(lhs), unicode(rhs)):
+            raise AssertionError('%s should be %s %s' % (lhs, self.operator, rhs))
+        return True
