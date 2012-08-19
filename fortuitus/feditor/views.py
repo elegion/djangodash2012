@@ -81,6 +81,17 @@ def project(request, company_slug, project_slug):
                 lhs=lhs, rhs=rhs, operator=operator, order=order)
             return redirect(request.path + '?testcase=%s' % testcase.slug)
 
+        if request.POST.get('action') == 'save_assert':
+            lhs = request.POST.get('lhs')
+            rhs = request.POST.get('rhs')
+            operator = request.POST.get('operator', 'eq')
+            assertion = TestCaseAssert.objects.get(pk=request.POST.get('assert'))
+
+            assertion.lhs = lhs
+            assertion.rhs = rhs
+            assertion.save()
+            return redirect(request.path + '?testcase=%s' % testcase.slug)
+
         tc_form = TestCaseForm(request.POST, instance=testcase)
         if tc_form.is_valid():
             tc_form.save()

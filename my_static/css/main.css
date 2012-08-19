@@ -239,7 +239,7 @@ h2 {
 .add-assert-form {
     margin: 4em 0 0 0;
 }
-    .add-assert-form .operator {
+    .add-assert-form .operator, .edit-assert-form .operator {
         vertical-align: middle;
     }
 

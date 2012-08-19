@@ -49,10 +49,19 @@
         </li>
         {% for assert in step.assertions.all %}
         <li class="assert">
-          <i class="icon-ok-sign-big"></i>
-          <span class="lhs">{{ assert.lhs }}</span>
-          <span class="operator">{{ assert.get_operator_display }}</span>
-          <span class="rhs">{{ assert.rhs }}</span>
+          <form method="post" class="edit-assert-form form-inline">
+            {% csrf_token %}
+            <input type="hidden" name="assert" value="{{ assert.pk }}">
+
+            <i class="icon-ok-sign-big"></i>
+            <span class="lhs js_show">{{ assert.lhs }}</span>
+            <input type="text" name="lhs" value="{{ assert.lhs }}" class="js_edit" style="display:none">
+            <span class="operator">{{ assert.get_operator_display }}</span>
+            <span class="rhs js_show">{{ assert.rhs }}</span>
+            <input type="text" name="rhs" value="{{ assert.rhs }}" class="js_edit" style="display:none">
+            <button class="btn btn-primary js-btn-save-assert
+              btn-save-assert"name="action" value="save_assert" style="display:none">Save</button>
+          </form>
         </li>
         {% endfor %}
     {% endfor %}

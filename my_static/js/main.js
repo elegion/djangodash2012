@@ -52,6 +52,21 @@ Fortuitus.initEditTestStep = function() {
 };
 
 Fortuitus.initEditAssert = function() {
+    $('.edit-assert-form').each( function() {
+        var $this = $(this);
+        var btn = $('<button class="btn btn-mini btn-edit-assert"><i class="icon-pencil"></i></button>');
+        btn.click(function() {
+            $this.find('.js_edit').show();
+            $this.find('.js_show').hide();
+            $this.find('.js-btn-save-assert').show();
+            btn.hide();
+            return false;
+        });
+
+        $this.append(btn);
+    });
+
+
     $('.js-btn-add-assert').click(function(){
         $('.js-add-assert-form').show();
         return false;
