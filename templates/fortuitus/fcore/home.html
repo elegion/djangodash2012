@@ -1,19 +1,19 @@
 {% extends "site_base.html" %}
 
 {% block body %}
-<div class="container container-home" xmlns="http://www.w3.org/1999/html">
+<div class="container container-home">
 
   <header class="masthead">
     <h1>API Tester</h1>
     <p>Amazing online tool to create automatic acceptance tests for REST/JSON APIs.</p>
     <p class="actions">
       <a href="{% url feditor_project company='demo' project='twitter' %}" class="btn btn-large btn-primary">Try Demo</a>
-      <a href="#" class="btn btn-large btn-success" disabled="disabled">Free Sign Up</a>
+      <a href="{% url signup %}" class="btn btn-large btn-success">Free Sign Up</a>
     </p>
   </header>
 
   <div class="menu menu-home">
-    <a href="">Sign In</a>
+    <a href="{% url login %}">Sign In</a>
   </div>
 
   <div class="marketing">
