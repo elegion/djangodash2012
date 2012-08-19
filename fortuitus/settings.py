@@ -1,5 +1,6 @@
 # Django settings for fortuitus project.
 import os
+from django.core.urlresolvers import reverse_lazy
 
 WORKDIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -165,6 +166,10 @@ LOGGING = {
 }
 
 TEST_RUNNER = 'djcelery.contrib.test_runner.CeleryTestSuiteRunner'
+
+
+LOGIN_URL = reverse_lazy('login')
+LOGIN_REDIRECT_URL = reverse_lazy('home')
 
 # Django-compressor settings
 COMPRESS_OFFLINE = True

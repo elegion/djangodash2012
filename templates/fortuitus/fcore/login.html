@@ -1,0 +1,24 @@
+{% extends "site_base.html" %}
+{% load bootstrap %}
+
+{% block body %}
+<div class="container container-home">
+
+  <header class="masthead">
+    <h1>API Tester</h1>
+    <p>Amazing online tool to create automatic acceptance tests for REST/JSON APIs.</p>
+  </header>
+
+  <section>
+    <h1>Sign in</h1>
+    <form method="post" class="form-vertical" action="{% url login %}">
+      {% csrf_token %}
+      {{ form|bootstrap }}
+      <button type="submit" class="btn btn-primary">Sign in</button>
+      <a class="btn btn-cancel" href="{% url home %}">Cancel</a>
+      <div style="display: none;"><input type="hidden" name="next" value="{{ next }}" /></div>
+    </form>
+  </section>
+</div>
+{% include '_footer.html' %}
+{% endblock %}
