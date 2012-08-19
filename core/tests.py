@@ -4,7 +4,7 @@ from django.test import TestCase
 class BaseTestCase(TestCase):
     def assertObject(self, instance, **params):
         """
-        Asserts that object have given attributes of given values
+        Asserts that object have given attributes of given values.
 
         Sample usage:
 
@@ -26,7 +26,8 @@ class BaseTestCase(TestCase):
 
     def assertModel(self, model, pk, **params):
         """
-        Fetches object (of given model) with pk=pk, then asserts that attributes updated
+        Fetches object (of given model) with pk=pk, then asserts that
+        attributes updated.
 
         Sample usage:
 
@@ -38,7 +39,8 @@ class BaseTestCase(TestCase):
 
     def assertObjectUpdated(self, old_instance, **params):
         """
-        Fetches object (of given model) with pk=pk, then asserts that attributes updated
+        Fetches object (of given model) with pk=pk, then asserts that
+        attributes updated.
 
         Sample usage:
 
