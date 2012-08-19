@@ -10,26 +10,47 @@
 </h2>
 
 <ol class="teststeps">
+    <form method="post" class="form_template" style="display: none">
+
+    </form>
     {% for step in testcase.steps.all %}
-        <li><span>
-            <span class="method">{{ step.get_method_display }}</span> {{ step.url }}
-            <form method="post">
+        <li>
+            <form method="post" class="js_params form-inline">
+            <div class="head">
+                <span class="method js_show">{{ step.get_method_display }}</span>
+                <select class="js_edit edit_method input-small" style="display:none" name="method" value="{{ step.method }}">
+                    {% for n, v in methods %}
+                    <option value="{{ v }}"{% if v == step.method %} selected="selected"{% endif %}>{{ n }}</option>
+                    {% endfor %}
+                </select>
+                <span class="url js_show">{{ step.url }}</span>
+                <input type="text" class="js_edit edit_url" style="display:none" name="url" value="{{ step.url }}">
+            </div>
+
+
                 {% csrf_token %}
-                <input type="hidden" name="action" value="save_step">
                 <input type="hidden" name="teststep" value="{{ step.pk }}">
-                <table class="params js_params table table-striped table-bordered">
+                <table class="params table table-striped table-bordered">
                 <tbody>
                 {% for name, value in step.params.items %}
                     <tr class="step_{{ name }}">
-                        <td class="name"><input type="hidden" name="js_{{ name }}" value="{{ value }}">{{ name }}</td>
-                        <td class="value">{{ value }}</td>
+                        <td class="name"><input type="hidden" name="js_{{ name }}" value="{{ value }}">
+                            <span>{{ name }}</span></td>
+                        <td class="value"><span>{{ value }}</span></td>
                     </tr>
                 {% endfor %}
+                <tr class="step_{{ name }} row_template" style="display:none">
+                    <td class="name"><span></span><input type="hidden" name="" value="">{{ name }}</td>
+                    <td class="value"><span></span></td>
+                </tr>
                 </tbody>
                 </table>
-                <button class="btn btn-primary js_save" style="display:none">Save</button>
+                <div class="form-action" style="display:none">
+                    <button class="btn btn-primary js_save btn-save-step"name="action" value="save_step">Save</button>
+                    <button class="btn btn-danger btn-delete-step" name="action" value="delete_step" onclick="return confirm('sure?');">Delete</button>
+                </div>
             </form>
-        </span></li>
+        </li>
     {% endfor %}
 </ol>
 

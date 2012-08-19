@@ -148,12 +148,25 @@ h2 {
             margin-top: 0.7em;
         }
             .teststeps li .params li {
-                font-size: 13px; /*@baseFontSize*/
                 margin-top: 0.5em;
             }
-        .teststeps li .params {
-            width: auto;
+        .teststeps .js_params {
+            position: relative;
+            width: 30em;
+            padding: 0 35px 0 0;
         }
+        .teststeps li .params {
+        }
+            .teststeps li .params td.name {
+                width: 50%;
+            }
+            .teststeps li .params td.value {
+                width: 50%;
+            }
+            .teststeps li .params .inplace {
+                margin: 0;
+                width: 13em;
+            }
 
 .testcase-info-form {
     display: none;
@@ -172,9 +185,20 @@ h2 {
 }
 
 .delete-button {
-    color: #F00;
     font-size: 25px;
     font-weight: bold;
     cursor: pointer;
-    padding: 0 10px 0 0;
+    /*padding: 0 10px 0 0;*/
+    color: #F00;
+    vertical-align: middle;
+}
+.add-button {
+    margin: 10px 0 0 0;
+}
+
+.btn-edit-testcase {
+    margin: 0 0 0 10px;
+}
+.btn-delete-step {
+    margin: 0 0 0 20px;
 }

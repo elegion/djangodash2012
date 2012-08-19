@@ -4,6 +4,7 @@ from django.template.response import TemplateResponse
 
 from fortuitus.feditor.forms import TestCaseForm
 from fortuitus.feditor.models import TestProject, TestCase, TestCaseStep
+from fortuitus.feditor.models_base import method_choices
 from fortuitus.feditor.params import Params
 from fortuitus.feditor.rights import can_edit_project
 
@@ -44,7 +45,17 @@ def project(request, company, project):
                 for param in request.POST:
                     if param.startswith('js_'):
                         step.params[param[3:]] = request.POST[param]
+                method = request.POST.get('method')
+                url = request.POST.get('url')
+                if url:
+                    step.url = url
+                if method and method in dict(method_choices):
+                    step.method = method
                 step.save()
+            return redirect(request.path + '?testcase=%s' % testcase.slug)
+
+        if request.POST.get('action') == 'delete_step':
+            TestCaseStep.objects.filter(pk=request.POST.get('teststep')).delete()
             return redirect(request.path + '?testcase=%s' % testcase.slug)
 
         tc_form = TestCaseForm(request.POST, instance=testcase)
@@ -58,6 +69,7 @@ def project(request, company, project):
         'testcase': testcase,
         'tc_form': tc_form,
         'new': request.GET.get('new'),
+        'methods': method_choices,
     }
     return TemplateResponse(request, 'fortuitus/feditor/project.html', data)
 

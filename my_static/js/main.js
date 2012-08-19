@@ -21,10 +21,28 @@ Fortuitus.initEditTestcaseForm = function() {
     $('.testcase-header small').before(delbtn);
 };
 
+Fortuitus.initEditTestCaseStep = function() {
+    $('.teststeps .head').each( function() {
+        var $this = $(this);
+        var btn = $('<button class="btn btn-mini btn-edit-testcase"><i class="icon-pencil"></i></button>');
+        btn.click(function() {
+            EditableTable.editMode($this.closest('form'), true);
+            $this.parent().find('.js_edit').show();
+            $this.parent().find('.js_show').hide();
+            btn.hide();
+            return false;
+        });
+
+        $this.append(btn);
+    });
+}
+
 $(document).ready(function() {
     Fortuitus.initEditTestcaseForm();
-    EditableTable.init($('.js_params'),
-        function(input) {
-            $(input).closest('form').find('.js_save').show();
-        });
+    Fortuitus.initEditTestCaseStep();
+
+//    EditableTable.init($('.js_params'),
+//        function(input) {
+//            $(input).closest('form').find('.js_save').show();
+//        });
 });
