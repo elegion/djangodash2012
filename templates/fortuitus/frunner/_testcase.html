@@ -60,7 +60,7 @@
           {% endif %}
           {% if step.response_body %}
             <h4>Response body</h4>
-            <div class="well">{{ step.response_body }}</div>
+            <pre><code>{{ step.response_body }}</code></pre>
           {% else %}
             <h4>Response body is empty</h4>
           {% endif %}
