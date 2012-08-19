@@ -168,11 +168,14 @@ class TestCaseStep(models_base.TestCaseStep):
     """
     testcase = models.ForeignKey(TestCase, related_name='steps')
 
+    resolved_params = ParamsField(blank=True, null=True)
+
     start_date = models.DateTimeField(null=True, blank=True)
     end_date = models.DateTimeField(null=True, blank=True)
     result = models.CharField(max_length=10, choices=TEST_CASE_RESULT_CHOICES,
                               blank=False, null=True)
     exception = models.TextField(blank=True, null=True)
+
 
     response_code = models.PositiveSmallIntegerField(null=True, blank=True)
     response_headers = JSONField(null=True, blank=True)
@@ -182,11 +185,22 @@ class TestCaseStep(models_base.TestCaseStep):
         """ Runs test case step. """
         logger.info('Starting TestStep %s', self)
         self.start_date = timezone.now()
+        self.resolved_params = self.params.resolve()
+        self.save()
+
         try:
             url = furl(testrun.base_url)
             url.join(self.url)
-            logger.info('Senging request: %s %s', self.method, url.url)
-            r = session.request(self.method, url.url)
+            logger.info('Senging request: %s %s%s', self.method, testrun.base_url, self.url)
+            if self.method in (models_base.Method.POST, models_base.Method.PUT, models_base.Method.PATCH):
+                data = self.resolved_params
+                params = {}
+            else:
+                data = {}
+                params = self.resolved_params
+            r = session.request(self.method,
+                                 '%s%s' % (testrun.base_url, self.url),
+                                 data=data, params=params)
 
             logger.info('Received response: %s (headers: %s)', r.status_code, r.headers)
             logger.debug('Response body: %s', r.text)

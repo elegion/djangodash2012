@@ -1,5 +1,6 @@
 import factory
 from fortuitus.feditor.factories import TestProjectF
+from fortuitus.feditor.params import Params
 
 from fortuitus.frunner import models
 
@@ -27,6 +28,11 @@ class TestCaseStepF(factory.Factory):
     order = 1
     method = models.models_base.Method.GET
     url = 'user_list.json'
+
+    @classmethod
+    def _prepare(cls, create, **kwargs):
+        kwargs['params'] = Params(**kwargs.get('params', {}))
+        return super(TestCaseStepF, cls)._prepare(create, **kwargs)
 
 
 class TestCaseAssertF(factory.Factory):

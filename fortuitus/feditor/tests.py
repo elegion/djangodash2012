@@ -25,6 +25,15 @@ class ParamsTestCase(TestCase):
         self.assertEquals(unicode(params2['login']), login)
         self.assertEquals(unicode(params2['password']), password)
 
+    def test_resolve(self):
+        """ Should return new Params() with all variables resolved
+        """
+        params = Params(login='Alex',
+                        password='{random:32:dlL}')
+        params2 = params.resolve()
+        self.assertEqual('Alex', params2['login'])
+        self.assertEqual(32, len(params2['password']))
+
 
 class ParamsFieldTestCase(TestCase):
     def test_inmodel(self):

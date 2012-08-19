@@ -279,7 +279,8 @@ class TestCaseStepModelTestCase(BaseTestCase):
         rfactories.TestCaseAssertF(step=step)
 
         res = step.run(step.testcase.testrun, step.testcase, requests, [])
-        requests.request.assert_called_once_with(step.method, '%s%s' % (step.testcase.testrun.base_url, step.url))
+        requests.request.assert_called_once_with(step.method, '%s%s' % (step.testcase.testrun.base_url, step.url),
+                                                 data={}, params={})
 
         self.assertEqual(3, rmodels.TestCaseAssert.do_assertion.call_count)
         rmodels.TestCaseAssert.do_assertion.assert_called_with([response])
@@ -352,6 +353,42 @@ class TestCaseStepModelTestCase(BaseTestCase):
             response_headers=None,
             response_code=None,
             exception='Timeout: Timeout error')
+
+    @mock.patch('requests.request', mock.Mock(return_value=ResponseF()))
+    def test_run_params_GET(self):
+        """ TestStep.run should use TestCase and TestStep params
+        If request method is GET, params should be serialized as query string
+        """
+        testcase = rfactories.TestCaseF()#params={'first_name': 'Alex', 'last_name': 'random:16:l'})
+        step = rfactories.TestCaseStepF(testcase=testcase,
+                                        method=emodels.models_base.Method.GET,
+                                        params={'username': 'alex', 'password': '{random:32:dlL}'})
+
+        step.run(step.testcase.testrun, step.testcase, requests, [])
+
+        requests.request.assert_called_once_with(step.method, ''.join([testcase.testrun.base_url, step.url]),
+                                                 data={},
+                                                 params={'username': 'alex', 'password': step.resolved_params['password']})
+
+#    def test_run_params_priority(self):
+#        """ TestStep.params should have higher priority than TestCase.params
+#        """
+
+    @mock.patch('requests.request', mock.Mock(return_value=ResponseF()))
+    def test_run_params_POST(self):
+        """ TestStep.run should use TestCase and TestStep params
+        If request method is POST (PUT), params should be transfered in request body
+        """
+        testcase = rfactories.TestCaseF()#params={'first_name': 'Alex', 'last_name': 'random:16:l'})
+        step = rfactories.TestCaseStepF(testcase=testcase,
+                                        method=emodels.models_base.Method.POST,
+                                        params={'username': 'alex', 'password': '{random:32:dlL}'})
+
+        step.run(step.testcase.testrun, step.testcase, requests, [])
+
+        requests.request.assert_called_once_with(step.method, ''.join([testcase.testrun.base_url, step.url]),
+                                                 data={'username': 'alex', 'password': step.resolved_params['password']},
+                                                 params={})
 
 
 class TestCaseAssertTestCase(TestCase):
