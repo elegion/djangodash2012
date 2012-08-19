@@ -58,14 +58,17 @@ Fortuitus.frunner = {
               .addClass('result-' + data.testcase_statuses[key]);
         }
       }
-      // Update favicon, if finished. Else - request new progress information
+      // Update favicon and title, if finished. Else - request new progress information.
       if (data.testrun_status != 'pending') {
         var $favicon = $('link[rel=icon]'),
+            $title = $('title'),
             $testrun_name = $('.js-testrun-human-name');
         if (data.testrun_status == 'success') {
           $favicon.attr('href', $favicon.attr('href').replace('_pending', ''));
+          $title.text($title.text().replace('(pending)', '(success)'));
         } else {
           $favicon.attr('href', $favicon.attr('href').replace('_pending', '_fail'));
+          $title.text($title.text().replace('(pending)', '(fail)'));
         }
         $testrun_name
             .text($testrun_name.text().replace(/\(.*\)/, '(' + data.testrun_status + ')'))
