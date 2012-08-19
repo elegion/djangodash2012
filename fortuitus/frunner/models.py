@@ -42,9 +42,10 @@ class TestCase(models_base.TestCase):
         responses = []
         for step in self.steps.all():
             try:
-                if not step.run(responses):
+                response = step.run(responses)
+                if not response:
                     break
-            except:
+            except Exception, e:
                 self.result = TestResult.error
                 break
         else:
@@ -72,21 +73,35 @@ class TestCaseStep(models_base.TestCaseStep):
     end_date = models.DateTimeField(null=True, blank=True)
     result = models.CharField(max_length=10, choices=TEST_CASE_RESULT_CHOICES,
                               blank=False, null=True)
+    exception = models.TextField(blank=True, null=True)
 
     response_code = models.PositiveSmallIntegerField(null=True, blank=True)
     response_headers = JSONField(null=True, blank=True)
     response_body = models.TextField(null=True, blank=True)
 
     def run(self, responses):
-        r = requests.request(self.method, self.url)
+        self.start_date = timezone.now()
+        try:
+            r = requests.request(self.method, self.url)
 
-        self.response_code = r.status_code
-        self.response_body = r.text
-        self.response_headers = r.headers
-        responses.push(r)
+            self.response_code = r.status_code
+            self.response_body = r.text
+            self.response_headers = r.headers
 
-        for assertion in self.assertions:
-            assertion.do_assertion(responses)
+            for assertion in self.assertions.all():
+                assertion.do_assertion(responses + [r])
+        except Exception, e:
+            self.exception = '%s: %s' % (e.__class__.__name__, str(e))
+            if isinstance(e, AssertionError):
+                self.result = TestResult.fail
+            else:
+                self.result = TestResult.error
+            raise
+        finally:
+            self.end_date = timezone.now()
+            self.result = self.result or TestResult.success
+            self.save()
+        return r
 
 
 class TestCaseAssert(models_base.TestCaseAssert):

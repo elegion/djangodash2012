@@ -4,7 +4,9 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.utils import timezone
 import mock
+import requests
 
+from core.factories import ResponseF
 from core.tests import BaseTestCase
 from fortuitus.feditor import factories as efactories, models as emodels
 from fortuitus.frunner import factories as rfactories, models as rmodels
@@ -87,7 +89,9 @@ class TestCaseModelTestCase(BaseTestCase):
 
         test_case.run()
 
-        rmodels.TestCaseStep.run.assert_called_twice_with([])
+        self.assertEqual(2, rmodels.TestCaseStep.run.call_count)
+        # TODO: fix test
+#        print rmodels.TestCaseStep.run.call_args_list
 
         self.assertObjectUpdated(test_case,
             start_date__gte=start,
@@ -131,6 +135,7 @@ class TestCaseModelTestCase(BaseTestCase):
                                  end_date__gte=start,
                                  result=rmodels.TestResult.fail)
 
+    @mock.patch('fortuitus.frunner.models.TestCaseStep.run', mock.Mock(side_effect=Exception('asdf')))
     def test_run_saves_exceptions(self):
         """
         Test case should save exceptions thrown by TestCaseStep.run
@@ -141,16 +146,102 @@ class TestCaseModelTestCase(BaseTestCase):
         rfactories.TestCaseStepF.create(testcase=test_case)
         rfactories.TestCaseStepF.create(testcase=test_case)
 
-        def raise_exception(*args, **kwargs):
-            raise Exception('asdf')
-
-        with mock.patch('fortuitus.frunner.models.TestCaseStep.run', raise_exception):
-            test_case.run()
+        test_case.run()
 
         self.assertObjectUpdated(test_case,
                                  start_date__gte=start,
                                  end_date__gte=start,
                                  result=rmodels.TestResult.error)
+
+
+class TestCaseStepModelTestCase(BaseTestCase):
+    @mock.patch('fortuitus.frunner.models.TestCaseAssert.do_assertion', mock.Mock(return_value=False))
+    @mock.patch('requests.request', mock.Mock(return_value=ResponseF()))
+    def test_run_performs_request(self):
+        """ TestCase.run should perform request, saves result
+        then perform all assertions and return response on success
+        """
+        start = timezone.now()
+
+        response = requests.request.return_value
+        step = rfactories.TestCaseStepF()
+
+        rfactories.TestCaseAssertF(step=step)
+        rfactories.TestCaseAssertF(step=step)
+        rfactories.TestCaseAssertF(step=step)
+
+        res = step.run([])
+        requests.request.assert_called_once_with(step.method, step.url)
+
+        self.assertEqual(3, rmodels.TestCaseAssert.do_assertion.call_count)
+        rmodels.TestCaseAssert.do_assertion.assert_called_with([response])
+        self.assertEqual(response, res)
+
+        self.assertObjectUpdated(step,
+                                 start_date__gte=start,
+                                 end_date__gte=start,
+                                 result=rmodels.TestResult.success,
+
+                                 response_code=response.status_code,
+                                 response_headers=response.headers,
+                                 response_body=response.text)
+
+    @mock.patch('fortuitus.frunner.models.TestCaseAssert.do_assertion', mock.Mock())
+    @mock.patch('requests.request', mock.Mock(return_value=ResponseF()))
+    def test_run_without_assertions(self):
+        """ Test case step should be runnable without TestCaseAssertions (and should be success)
+        """
+        start = timezone.now()
+
+        step = rfactories.TestCaseStepF()
+
+        step.run([])
+
+        self.assertEqual(0, rmodels.TestCaseAssert.do_assertion.call_count)
+
+        self.assertObjectUpdated(step,
+            start_date__gte=start,
+            end_date__gte=start,
+            result=rmodels.TestResult.success)
+
+    @mock.patch('fortuitus.frunner.models.TestCaseAssert.do_assertion', mock.Mock(side_effect=AssertionError('qwer')))
+    @mock.patch('requests.request', mock.Mock(return_value=ResponseF()))
+    def test_run_saves_assertion_exceptions(self):
+        """ Test case step should save exceptions raised by assertion
+        """
+        step = rfactories.TestCaseStepF()
+        rfactories.TestCaseAssertF(step=step)
+        rfactories.TestCaseAssertF(step=step)
+
+        with self.assertRaises(AssertionError):
+            step.run([])
+
+        self.assertEqual(1, rmodels.TestCaseAssert.do_assertion.call_count)
+
+        self.assertObjectUpdated(step,
+            result=rmodels.TestResult.fail,
+            exception='AssertionError: qwer')
+
+    @mock.patch('fortuitus.frunner.models.TestCaseAssert.do_assertion', mock.Mock(side_effect=AssertionError('qwer')))
+    @mock.patch('requests.request', mock.Mock(side_effect=requests.Timeout('Timeout error')))
+    def test_run_saves_requests_exception(self):
+        """ Test case should save exceptions thrown by requests.request
+        """
+        step = rfactories.TestCaseStepF()
+        rfactories.TestCaseAssertF(step=step)
+        rfactories.TestCaseAssertF(step=step)
+
+        with self.assertRaises(requests.Timeout):
+            step.run([])
+
+        self.assertEqual(0, rmodels.TestCaseAssert.do_assertion.call_count)
+
+        self.assertObjectUpdated(step,
+            result=rmodels.TestResult.error,
+            response_body=None,
+            response_headers=None,
+            response_code=None,
+            exception='Timeout: Timeout error')
 
 
 class TestCaseAssertTestCase(TestCase):
