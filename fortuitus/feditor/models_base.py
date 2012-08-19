@@ -15,11 +15,19 @@ class Method:
     PATCH = 'PATCH'
 
 
+class LoginType:
+    NONE = 'none'
+    BASIC = 'basic'
+    COOKIE = 'cookie'
+    OAUTH = 'oauth'
+
+
 method_choices = [(f, f) for f in dir(Method) if not f.startswith('_')]
 operator_choices = [('eq', '=')]
-login_type_choices = [('basic', 'HTTP Basic Auth'),
-                      ('cookie', 'Login via login URL'),
-                      ('oauth', 'OAuth')]
+login_type_choices = [(LoginType.NONE, 'Anonymous'),
+                      (LoginType.BASIC, 'HTTP Basic Auth'),
+                      (LoginType.COOKIE, 'Login via login URL'),
+                      (LoginType.OAUTH, 'OAuth')]
 
 
 class TestCase(models.Model):
@@ -38,9 +46,7 @@ class TestCase(models.Model):
     slug = AutoSlugField(populate_from='name')
     name = models.CharField(max_length=100)
 
-    need_login = models.BooleanField(default=False)
-    login_type = models.CharField(max_length=16, choices=login_type_choices,
-                                  null=True, blank=True)
+    login_type = models.CharField(max_length=16, choices=login_type_choices)
     login_options = JSONField(null=True, blank=True)
 
     class Meta:
