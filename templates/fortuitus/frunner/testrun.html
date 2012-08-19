@@ -1,25 +1,32 @@
 {% extends 'site_base.html' %}
 
+{% block pagetitle %}{{ testrun.human_name }} | {{ project.name }} | APITester{% endblock %}
+
 {% block content %}
-  <header class="subhead" id="overview">
-    <h1>Project “{{ project.name }}” run</h1>
-  </header>
+  <div class="row-fluid">
+    <div class="span2 sidebar">
+      <h1>{{ project.name }}</h1>
+      <h3>{{ testrun.human_name }}</h3>
+      <ul class="testcases">
+        {% for tc in testrun.testcases.all %}
+          <li{% if tc.pk == testcase.pk %} class="active"{% endif %}>
+            <a href="{% url frunner_testrun project_slug=project.slug testrun_number=testrun.number testcase_slug=tc.slug %}">
+              {{ tc.result_symbol }}
+              {{ tc.name }}
+            </a></li>
+        {% endfor %}
+      </ul>
+      {% include 'fortuitus/feditor/_add_testcase_form.html' %}
+    </div>
 
-  {% for test_case in testrun.testcases.all %}
-  <dl class="run_details">
-    <dt>Name</dt>
-    <dd>{{ test_case.name }}</dd>
-    <dt>Start</dt>
-    <dd>{{ test_case.start_date }}</dd>
-    <dt>End</dt>
-    <dd>{{ test_case.end_date }}</dd>
-    <dt>Result</dt>
-    <dd>{{ test_case.result }}</dd>
-    {% if test_case.exception %}
-      <dt>Exception</dt>
-      <dd>{{ test_case.exception }}</dd>
-    {% endif %}
-  </dl>
-  {% endfor %}
-
+    <div class="span10">
+      {% if not testcase %}
+        <div class="hero-unit">
+          <h1>No testcases found</h1>
+        </div>
+      {% else %}
+        {% include 'fortuitus/frunner/_testcase.html' %}
+      {% endif %}
+    </div>
+  </div>
 {% endblock %}

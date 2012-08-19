@@ -46,6 +46,13 @@ class TestRun(models.Model):
     def __unicode__(self):
         return u'%s (%s)' % (self.project.name, self.base_url)
 
+    def human_name(self):
+        return 'Run #%s (%s)' % (self.pk, self.result or TestResult.pending)
+
+    @property
+    def number(self):
+        return self.pk
+
     @staticmethod
     def create_from_project(project):
         testrun = TestRun.objects.create(project=project,
@@ -95,6 +102,19 @@ class TestCase(models_base.TestCase):
     result = models.CharField(max_length=10, choices=TEST_CASE_RESULT_CHOICES,
                               blank=False, null=True)
     exception = models.TextField(blank=True, null=True)
+
+    def result_symbol(self):
+        if self.result == TestResult.success:
+            return u'\u2022'
+        elif self.result == TestResult.error:
+            return u'E'
+        elif self.result == TestResult.fail:
+            return u'F'
+        else:
+            return u'\u00A0'
+
+    def result_str(self):
+        return self.result or TestResult.pending
 
     def run(self, testrun):
         """ Runs the test case attached to :param testrun:. """

@@ -1,0 +1,21 @@
+<h2 class="testcase-header result-{{ testcase.result }}">
+  <span class="result-symbol">&bull;</span> {{ testcase.name }} ({{ testcase.start_date|default:'pending' }})
+</h2>
+
+<ol class="teststeps">
+  {% for step in testcase.steps.all %}
+    <li><span>
+      <span class="method">{{ step.get_method_display }}</span> {{ step.url }}
+      <table class="params js_params table table-striped table-bordered">
+        <tbody>
+        {% for name, value in step.params.items %}
+          <tr class="step_{{ name }}">
+            <td class="name"><input type="hidden" name="js_{{ name }}" value="{{ value }}">{{ name }}</td>
+            <td class="value">{{ value }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </span></li>
+  {% endfor %}
+</ol>

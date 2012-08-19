@@ -8,6 +8,7 @@
     {% compress css %}
     <link rel="stylesheet" href="{{ STATIC_URL }}css/lib/bootstrap/css/bootstrap.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}css/main.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/frunner.css">
     {% endcompress %}
   </head>
   <body>
@@ -19,5 +20,6 @@
     <script src="{{ STATIC_URL }}js/editabletable.js"></script>
     <script src="{{ STATIC_URL }}js/main.js"></script>
     {% endcompress %}
+    <script type="text/javascript">{% block footerjs %}{% endblock %}</script>
   </body>
 </html>

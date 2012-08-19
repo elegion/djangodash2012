@@ -30,14 +30,23 @@ def project_runs(request, project_id):
                             context)
 
 
-def testrun(request, project_id, testrun_id):
+def testrun(request, project_slug, testrun_number, testcase_slug=None):
     """
     Shows test run details.
     """
-    project = get_object_or_404(TestProject, pk=project_id)
-    testrun = get_object_or_404(TestRun, pk=testrun_id)
+    project = get_object_or_404(TestProject, slug=project_slug)
+    testrun = get_object_or_404(project.test_runs, pk=testrun_number)
+    if testcase_slug:
+        testcase = get_object_or_404(testrun.testcases, slug=testcase_slug)
+    else:
+        try:
+            testcase = testrun.testcases.all()[0]
+        except IndexError:
+            testcase = None
+
     context = {'project': project,
-               'testrun': testrun}
+               'testrun': testrun,
+               'testcase': testcase}
     return TemplateResponse(request, 'fortuitus/frunner/testrun.html',
                             context)
 

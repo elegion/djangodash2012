@@ -49,14 +49,5 @@ Fortuitus.initEditTestStep = function() {
         $('.add_step_form').hide();
         return false;
     });
-}
+};
 
-$(document).ready(function() {
-    Fortuitus.initEditTestcaseForm();
-    Fortuitus.initEditTestStep();
-
-//    EditableTable.init($('.js_params'),
-//        function(input) {
-//            $(input).closest('form').find('.js_save').show();
-//        });
-});

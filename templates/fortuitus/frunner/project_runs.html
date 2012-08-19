@@ -5,7 +5,7 @@
     <h1>Project “{{ project.name }}” runs</h1>
   </header>
 
-  <form method="POST" action="{% url frunner_run_project project_id=project.pk %}">
+  <form method="POST" action="{% url frunner_run_project project_slug=project.slug %}">
     {% csrf_token %}
     <input type="submit" class="btn btn-primary btn-large" value="Run now!" />
   </form>
@@ -13,7 +13,7 @@
   <ul class="runs">
     {% for run in runs %}
       <li class="{{ run.result }}">
-        <a href="{% url frunner_testrun project_id=project.id testrun_id=run.id %}">
+        <a href="{% url frunner_testrun project_slug=project.slug testrun_number=run.pk %}">
           {{ run.start_date }}
         </a>
       </li>

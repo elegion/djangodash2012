@@ -1,0 +1,14 @@
+.testcase-header .result-symbol {
+  font-size: 200%;
+  vertical-align: middle;
+}
+.testcase-header.result-error .result-symbol {
+  color: #a00;
+}
+.testcase-header.result-success .result-symbol {
+  color: #0a0;
+}
+.testcase-header.result- .result-symbol,
+.testcase-header.result-pending .result-symbol {
+  color: #aaa;
+}
