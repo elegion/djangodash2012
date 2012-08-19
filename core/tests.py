@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.contrib.auth.models import User
 
 
 class BaseTestCase(TestCase):
@@ -49,3 +50,8 @@ class BaseTestCase(TestCase):
 
         """
         self.assertModel(old_instance.__class__, old_instance.pk, **params)
+
+    def login_user(self, username='username', password='password'):
+        user = User.objects.create_user(username=username, password=password)
+        self.client.login(username=username, password=password)
+        return user
