@@ -6,6 +6,11 @@ from fortuitus.feditor import models_base
 from fortuitus.feditor.dbfields import ParamsField
 
 
+class TestProjectManager(models.Manager):
+    def get_by_company(self, company):
+        return TestProject.objects.filter(company=company)
+
+
 class TestProject(models.Model):
     """
     Test project.
@@ -22,6 +27,8 @@ class TestProject(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+
+    objects = TestProjectManager()
 
     class Meta():
         ordering = ('slug',)
