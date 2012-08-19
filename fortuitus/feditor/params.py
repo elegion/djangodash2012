@@ -8,6 +8,10 @@ from django.utils.datastructures import SortedDict
 
 class Params(SortedDict):
     """ Represents query parameters, JSON serializable."""
+    def __init__(self, **params):
+        """Emulate dict init"""
+        super(Params, self).__init__(data=params)
+
     def dumps(self):
         """ Serialize parameters in JSON format. """
         return json.dumps(self)
