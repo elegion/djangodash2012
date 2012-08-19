@@ -1,5 +1,7 @@
 {% extends 'site_base.html' %}
 
+{% block pagetitle %}Test runs | {{ project.name }} | {{ block.super }}{% endblock %}
+
 {% block content %}
   <header class="subhead" id="overview">
     <h1>Project “{{ project.name }}” runs</h1>
