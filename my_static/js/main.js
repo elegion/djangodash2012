@@ -42,7 +42,7 @@ Fortuitus.initEditTestStep = function() {
     $form.find('.js_edit').show();
     $form.find('.js_show').hide();
 
-    $('.add-test').click(function(){
+    $('.js-btn-add-test').click(function(){
         $('.add_step_form').show();
         $('.js-param-help').show();
         return false;

@@ -30,7 +30,12 @@ def project(request, company_slug, project_slug):
 
         if request.POST.get('action') == 'add_testcase':
             name = TestCase.objects.get_unique_new_name()
-            tc = TestCase.objects.create(name=name, project=project)
+            order = TestCaseStep.objects.filter(testcase=testcase).order_by('-order')
+            if order:
+                order = order[0].order + 1
+            else:
+                order = 1
+            tc = TestCase.objects.create(name=name, project=project, order=order)
             return redirect(request.path + '?testcase=%s' % tc.slug)
 
         if request.POST.get('action') == 'delete_testcase':
@@ -95,7 +100,7 @@ def project(request, company_slug, project_slug):
         tc_form = TestCaseForm(request.POST, instance=testcase)
         if tc_form.is_valid():
             tc_form.save()
-            return redirect('.')
+            return redirect(request.path + '?testcase=%s' % testcase.slug)
 
     data = {
         'project': project,
