@@ -8,7 +8,6 @@
   {% elif testrun.result_str == 'fail' or testrun.result_str == 'error' %}
     <link rel="icon" type="image/vnd.microsoft.icon" href="{{ STATIC_URL }}favicon_fail.ico" />
   {% else %}
-    {{ testrun.result_str }}
     {{ block.super }}
   {% endif %}
 {% endblock %}
