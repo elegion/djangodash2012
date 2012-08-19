@@ -93,6 +93,7 @@ class TestCase(models_base.TestCase):
     end_date = models.DateTimeField(null=True, blank=True)
     result = models.CharField(max_length=10, choices=TEST_CASE_RESULT_CHOICES,
                               blank=False, null=True)
+    exception = models.TextField(blank=True, null=True)
 
     def run(self, testrun):
         logger.info('Starting TestCase %s', self)
