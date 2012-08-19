@@ -1,0 +1,17 @@
+{% extends 'site_base.html' %}
+
+{% block content %}
+  <header class="subhead" id="overview">
+    <h1>Project “{{ project.name }}” runs</h1>
+  </header>
+
+  <ul class="runs">
+    {% for run in runs %}
+      <li class="{{ run.result }}">
+        <a href="{% url frunner_test_case project_id=project.id test_case_id=run.id %}">
+          {{ run.start_date }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}

@@ -1,7 +1,12 @@
+import operator
+
+from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.utils import timezone
 import mock
+import requests
 
+from core.factories import ResponseF
 from core.tests import BaseTestCase
 from fortuitus.feditor import factories as efactories, models as emodels
 from fortuitus.frunner import factories as rfactories, models as rmodels
@@ -20,7 +25,8 @@ class TaskTestCase(BaseTestCase):
 
 class RunTestsTaskTestCase(BaseTestCase):
     def test_non_existing_test(self):
-        """ Should raise emodels.TestCase.DoesNotExist if test case not found
+        """
+        Should raise emodels.TestCase.DoesNotExist if test case not found.
         """
         with self.assertRaises(emodels.TestCase.DoesNotExist):
             run_tests(10000)
@@ -69,6 +75,21 @@ class RunTestsTaskTestCase(BaseTestCase):
         self.assertEqual(assertion_2_1.rhs, assertion_2_1_copy.rhs)
         self.assertEqual(assertion_2_1.operator, assertion_2_1_copy.operator)
 
+    @mock.patch('fortuitus.frunner.models.TestCase.run', mock.Mock())
+    def test_test_cases_can_be_duplicated(self):
+        """
+        Should copy same TestCase twice without raising "primary key must be
+        unique" IntegrityError.
+        """
+        count = rmodels.TestCase.objects.all().count
+        test_case = efactories.TestCaseF.create()
+        self.assertEqual(count(), 0)
+        run_tests(test_case.pk)
+        self.assertEqual(count(), 1)
+        run_tests(test_case.pk)
+        self.assertEqual(count(), 2)
+        rmodels.TestCase.run.assert_has_calls([mock.call(), mock.call()])
+
 
 class TestCaseModelTestCase(BaseTestCase):
     @mock.patch('fortuitus.frunner.models.TestCaseStep.run', mock.Mock(return_value=True))
@@ -84,7 +105,9 @@ class TestCaseModelTestCase(BaseTestCase):
 
         test_case.run()
 
-        rmodels.TestCaseStep.run.assert_called_twice_with([])
+        self.assertEqual(2, rmodels.TestCaseStep.run.call_count)
+        # TODO: fix test
+#        print rmodels.TestCaseStep.run.call_args_list
 
         self.assertObjectUpdated(test_case,
             start_date__gte=start,
@@ -128,6 +151,7 @@ class TestCaseModelTestCase(BaseTestCase):
                                  end_date__gte=start,
                                  result=rmodels.TestResult.fail)
 
+    @mock.patch('fortuitus.frunner.models.TestCaseStep.run', mock.Mock(side_effect=Exception('asdf')))
     def test_run_saves_exceptions(self):
         """
         Test case should save exceptions thrown by TestCaseStep.run
@@ -138,16 +162,102 @@ class TestCaseModelTestCase(BaseTestCase):
         rfactories.TestCaseStepF.create(testcase=test_case)
         rfactories.TestCaseStepF.create(testcase=test_case)
 
-        def raise_exception(*args, **kwargs):
-            raise Exception('asdf')
-
-        with mock.patch('fortuitus.frunner.models.TestCaseStep.run', raise_exception):
-            test_case.run()
+        test_case.run()
 
         self.assertObjectUpdated(test_case,
                                  start_date__gte=start,
                                  end_date__gte=start,
                                  result=rmodels.TestResult.error)
+
+
+class TestCaseStepModelTestCase(BaseTestCase):
+    @mock.patch('fortuitus.frunner.models.TestCaseAssert.do_assertion', mock.Mock(return_value=False))
+    @mock.patch('requests.request', mock.Mock(return_value=ResponseF()))
+    def test_run_performs_request(self):
+        """ TestCase.run should perform request, saves result
+        then perform all assertions and return response on success
+        """
+        start = timezone.now()
+
+        response = requests.request.return_value
+        step = rfactories.TestCaseStepF()
+
+        rfactories.TestCaseAssertF(step=step)
+        rfactories.TestCaseAssertF(step=step)
+        rfactories.TestCaseAssertF(step=step)
+
+        res = step.run([])
+        requests.request.assert_called_once_with(step.method, step.url)
+
+        self.assertEqual(3, rmodels.TestCaseAssert.do_assertion.call_count)
+        rmodels.TestCaseAssert.do_assertion.assert_called_with([response])
+        self.assertEqual(response, res)
+
+        self.assertObjectUpdated(step,
+                                 start_date__gte=start,
+                                 end_date__gte=start,
+                                 result=rmodels.TestResult.success,
+
+                                 response_code=response.status_code,
+                                 response_headers=response.headers,
+                                 response_body=response.text)
+
+    @mock.patch('fortuitus.frunner.models.TestCaseAssert.do_assertion', mock.Mock())
+    @mock.patch('requests.request', mock.Mock(return_value=ResponseF()))
+    def test_run_without_assertions(self):
+        """ Test case step should be runnable without TestCaseAssertions (and should be success)
+        """
+        start = timezone.now()
+
+        step = rfactories.TestCaseStepF()
+
+        step.run([])
+
+        self.assertEqual(0, rmodels.TestCaseAssert.do_assertion.call_count)
+
+        self.assertObjectUpdated(step,
+            start_date__gte=start,
+            end_date__gte=start,
+            result=rmodels.TestResult.success)
+
+    @mock.patch('fortuitus.frunner.models.TestCaseAssert.do_assertion', mock.Mock(side_effect=AssertionError('qwer')))
+    @mock.patch('requests.request', mock.Mock(return_value=ResponseF()))
+    def test_run_saves_assertion_exceptions(self):
+        """ Test case step should save exceptions raised by assertion
+        """
+        step = rfactories.TestCaseStepF()
+        rfactories.TestCaseAssertF(step=step)
+        rfactories.TestCaseAssertF(step=step)
+
+        with self.assertRaises(AssertionError):
+            step.run([])
+
+        self.assertEqual(1, rmodels.TestCaseAssert.do_assertion.call_count)
+
+        self.assertObjectUpdated(step,
+            result=rmodels.TestResult.fail,
+            exception='AssertionError: qwer')
+
+    @mock.patch('fortuitus.frunner.models.TestCaseAssert.do_assertion', mock.Mock(side_effect=AssertionError('qwer')))
+    @mock.patch('requests.request', mock.Mock(side_effect=requests.Timeout('Timeout error')))
+    def test_run_saves_requests_exception(self):
+        """ Test case should save exceptions thrown by requests.request
+        """
+        step = rfactories.TestCaseStepF()
+        rfactories.TestCaseAssertF(step=step)
+        rfactories.TestCaseAssertF(step=step)
+
+        with self.assertRaises(requests.Timeout):
+            step.run([])
+
+        self.assertEqual(0, rmodels.TestCaseAssert.do_assertion.call_count)
+
+        self.assertObjectUpdated(step,
+            result=rmodels.TestResult.error,
+            response_body=None,
+            response_headers=None,
+            response_code=None,
+            exception='Timeout: Timeout error')
 
 
 class TestCaseAssertTestCase(TestCase):
@@ -156,12 +266,12 @@ class TestCaseAssertTestCase(TestCase):
         a = rmodels.TestCaseAssert()
 
         a.lhs = '0.status_code'
-        a.operator = 'Eq'
+        a.operator = 'eq'
         a.rhs = '404'
         self.assertTrue(a.do_assertion(responses))
 
         a.lhs = '.status_code'
-        a.operator = 'Eq'
+        a.operator = 'eq'
         a.rhs = '404'
         self.assertFalse(a.do_assertion(responses))
 
@@ -169,54 +279,73 @@ class TestCaseAssertTestCase(TestCase):
 class ResolversTestCase(TestCase):
     def test_resolve_operator_short_name(self):
         """ Tests operator resolver with short operator name. """
-        from . import resolvers, operators
-        Op = resolvers.resolve_operator('Eq')
-        self.assertEqual(Op, operators.Eq)
+        from fortuitus.frunner import resolvers
+        op = resolvers.resolve_operator('eq')
+        self.assertEqual(op, operator.eq)
 
     def test_resolve_operator_full_name(self):
         """
         Tests operator resolver with full operator name, including module.
         """
-        from . import resolvers, operators
-        Op = resolvers.resolve_operator('fortuitus.frunner.operators.Eq')
-        self.assertEqual(Op, operators.Eq)
+        from fortuitus.frunner import resolvers
+        op = resolvers.resolve_operator('operator.lt')
+        self.assertEqual(op, operator.lt)
 
     def test_resolve_lhs_last_response(self):
         """ Test lhs resolver: last response, dictionary. """
-        from .resolvers import resolve_lhs
+        from fortuitus.frunner.resolvers import resolve_lhs
         responses = [{'status_code': 404}, {'status_code': 200}]
         self.assertEqual(resolve_lhs('.status_code', responses), 200)
 
     def test_resolve_lhs_arbitrary_response(self):
         """ Test lhs resolver: arbitrary response, dictionary. """
-        from .resolvers import resolve_lhs
+        from fortuitus.frunner.resolvers import resolve_lhs
         responses = [{'status_code': 404}, {'status_code': 200}]
         self.assertEqual(resolve_lhs('0.status_code', responses), 404)
 
     def test_resolve_lhs_object(self):
         """ Test lhs resolver: arbitrary response, object. """
-        from .resolvers import resolve_lhs
+        from fortuitus.frunner.resolvers import resolve_lhs
         responses = [type('TestResp', (), {'status_code': 200})]
         self.assertEqual(responses[0].status_code, 200)
         self.assertEqual(resolve_lhs('0.status_code', responses), 200)
 
     def test_resolve_rhs_plain_value(self):
         """ Test rhs resolver: plain value. """
-        from .resolvers import resolve_rhs
+        from fortuitus.frunner.resolvers import resolve_rhs
         self.assertEqual(resolve_rhs(1, []), 1)
         self.assertEqual(resolve_rhs('foo', []), 'foo')
 
     def test_resolve_rhs_reference(self):
         """ Test rhs resolver: step reference. """
-        from .resolvers import resolve_rhs
+        from fortuitus.frunner.resolvers import resolve_rhs
         responses = [{'status_code': 404}, {'status_code': 200}]
         self.assertEqual(resolve_rhs('1.status_code', responses), 200)
 
 
-class OperatorsTestCase(TestCase):
-    def test_Eq(self):
-        from .operators import Eq
-        eq = Eq(1, 1)
-        self.assertTrue(eq.run())
-        eq = Eq(1, 2)
-        self.assertFalse(eq.run())
+class RunnerViewsTestCase(TestCase):
+    def test_projects(self):
+        """ Tests project list page is rendered properly. """
+        response = self.client.get(reverse('frunner_projects'))
+        self.assertEqual(200, response.status_code)
+        self.assertTemplateUsed('fortuitus/frunner/projects.html')
+
+    def test_project_runs(self):
+        """ Tests project list page is rendered properly. """
+        project = efactories.TestProjectF.create()
+        url = reverse('frunner_project_runs',
+                      kwargs={'project_id': project.id})
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        self.assertTemplateUsed('fortuitus/frunner/project_runs.html')
+
+    def test_test_case(self):
+        """ Tests project list page is rendered properly. """
+        project = efactories.TestProjectF.create()
+        case = rfactories.TestCaseF.create()
+        url = reverse('frunner_test_case',
+                      kwargs={'project_id': project.pk,
+                              'test_case_id': case.pk})
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        self.assertTemplateUsed('fortuitus/frunner/test_case.html')

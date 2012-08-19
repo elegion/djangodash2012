@@ -1,3 +1,4 @@
+import operator
 from operator import attrgetter, itemgetter
 
 from django.utils.importlib import import_module
@@ -53,12 +54,14 @@ def resolve_operator(value):
     """
     Returns operator class from operator string.
 
-    Might be full class path, i.e. `my.awesome.module.MyOperator` or simply
-    `MyOperator`.  In the latter case it is imported from `frunner.operators`
+    Might be full path, i.e. `my.awesome.module.myoperator` or simply
+    `operator`.  In the latter case it is imported from standard `operator`
     module.
 
+    Writing your own operators is dead simple: just create a function that
+    takes two arguments and returns a boolean.
+
     """
-    mdl, _, cls = value.rpartition('.')
-    mdl = 'fortuitus.frunner.operators' if not mdl else mdl
-    module = import_module(mdl)
-    return getattr(module, cls)
+    mdl, _, func = value.rpartition('.')
+    module = operator if not mdl else import_module(mdl)
+    return getattr(module, func)

@@ -159,3 +159,7 @@ h2 {
 .btn-delete-testcase {
     margin: 0 0 0 0.7em;
 }
+
+.error {
+    color: red;
+}

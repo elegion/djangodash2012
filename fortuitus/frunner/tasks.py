@@ -24,13 +24,15 @@ def run_tests(test_id):
     etest = emodels.TestCase.objects.get(pk=test_id)
 
     # Now copy test and all related data
-    rtest = rmodels.TestCase.objects.create(project=etest.project, **model_to_dict(etest, exclude='project'))
+    kwargs = model_to_dict(etest, exclude=['id', 'project'])
+    rtest = rmodels.TestCase.objects.create(project=etest.project, **kwargs)
 
     for estep in etest.steps.all():
-        rstep = rmodels.TestCaseStep.objects.create(testcase=rtest, **model_to_dict(estep, exclude=['testcase']))
+        kwargs = model_to_dict(estep, exclude=['testcase'])
+        rstep = rmodels.TestCaseStep.objects.create(testcase=rtest, **kwargs)
 
         for assertion in estep.assertions.all():
-            rmodels.TestCaseAssert.objects.create(step=rstep,
-                                                  **model_to_dict(assertion, exclude=['step']))
+            kwargs = model_to_dict(assertion, exclude=['step'])
+            rmodels.TestCaseAssert.objects.create(step=rstep, **kwargs)
 
     rtest.run()

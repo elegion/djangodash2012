@@ -7,7 +7,7 @@ from fortuitus.feditor import models
 class TestProjectF(factory.Factory):
     FACTORY_FOR = models.TestProject
 
-    company = factory.LazyAttribute(lambda o: CompanyF.create())
+    company = factory.SubFactory(CompanyF)
     name = factory.Sequence(lambda n: 'TestProject #%s' % n)
 
     base_url = 'http://api.example.com/'
@@ -16,7 +16,7 @@ class TestProjectF(factory.Factory):
 class TestCaseF(factory.Factory):
     FACTORY_FOR = models.TestCase
 
-    project = factory.LazyAttribute(lambda o: TestProjectF.create())
+    project = factory.SubFactory(TestProjectF)
     name = factory.Sequence(lambda n: 'TestCase #%s' % n)
 
 
