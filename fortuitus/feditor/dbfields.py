@@ -8,7 +8,7 @@ from fortuitus.feditor.params import Params
 
 class ParamsField(models.TextField):
     """
-    Serialized query parameters to store them in the database.
+    Serializes query parameters to store them in the database.
 
     """
     __metaclass__ = models.SubfieldBase
