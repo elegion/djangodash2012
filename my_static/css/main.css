@@ -134,7 +134,7 @@ h2 {
 }
     .teststeps li {
         font-size: 18px; /*@baseFontSize * 1.4 */
-        margin-top: 1em;
+        margin-top: 1.5em;
     }
     .teststeps li .method {
         color: #999;
@@ -143,17 +143,14 @@ h2 {
         font-size: 15px; /*@baseFontSize * 1.2 */
         vertical-align: top;
     }
-        .teststeps li .params {
-            list-style: none;
-            margin-top: 0.7em;
-        }
             .teststeps li .params li {
                 margin-top: 0.5em;
             }
-        .teststeps .js_params {
+        .js_params {
             position: relative;
             width: 30em;
             padding: 0 35px 0 0;
+            margin-top: 0.7em;
         }
         .teststeps li .params {
         }
@@ -163,7 +160,7 @@ h2 {
             .teststeps li .params td.value {
                 width: 50%;
             }
-            .teststeps li .params .inplace {
+            .js_params .inplace {
                 margin: 0;
                 width: 13em;
             }
@@ -193,7 +190,7 @@ h2 {
     vertical-align: middle;
 }
 .add-button {
-    margin: 10px 0 0 0;
+    margin: 10px 0 10px 0;
 }
 
 .btn-edit-testcase {
@@ -202,3 +199,9 @@ h2 {
 .btn-delete-step {
     margin: 0 0 0 20px;
 }
+.add_step_form {
+    margin: 2em 0 0 1.8em;
+}
+    .add_step_form h2 {
+        margin: 0 0 0.5em 0;
+    }

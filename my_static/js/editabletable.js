@@ -51,10 +51,10 @@ EditableTable.hideAllDelete = function() {
 
 EditableTable.showAddButton = function() {
     var $this = EditableTable._$table;
-    if ($this.next('.add-button').length != 0) {
-        $this.next('.add-button').show();
+    if ($this.find('.add-button').length != 0) {
+        $this.find('.add-button').show();
     } else {
-        var $addbtn = $('<a class="btn add-button btn-addtestcase btn-success btn-mini"><i class="icon-plus icon-white"></i></a>');
+        var $addbtn = $('<a class="btn add-button btn-addtestcase btn-success btn-mini"><i class="icon-plus icon-white"></i> param</a>');
         $addbtn.click(function(){
             var $newtr = $this.find('.row_template').first().clone();
             $newtr.removeClass('row_template');

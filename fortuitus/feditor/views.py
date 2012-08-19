@@ -37,8 +37,17 @@ def project(request, company, project):
             TestCase.objects.filter(pk=request.POST.get('testcase')).delete()
             return redirect(request.path)
 
-        if request.POST.get('action') == 'save_step':
-            step = TestCaseStep.objects.filter(pk=request.POST.get('teststep'))
+        if request.POST.get('action') in ['save_step', 'add_step']:
+            if request.POST.get('action') == 'add_step':
+                order = TestCaseStep.objects.filter(testcase=testcase).order_by('-order')
+                if order:
+                    order = order[0].order + 1
+                else:
+                    order = 1
+                step = [TestCaseStep(testcase=testcase, order=order)]
+            else:
+                step = TestCaseStep.objects.filter(pk=request.POST.get('teststep'))
+
             if step:
                 step = step[0]
                 step.params = Params()

@@ -10,23 +10,19 @@
 </h2>
 
 <ol class="teststeps">
-    <form method="post" class="form_template" style="display: none">
-
-    </form>
     {% for step in testcase.steps.all %}
         <li>
             <form method="post" class="js_params form-inline">
-            <div class="head">
-                <span class="method js_show">{{ step.get_method_display }}</span>
-                <select class="js_edit edit_method input-small" style="display:none" name="method" value="{{ step.method }}">
-                    {% for n, v in methods %}
-                    <option value="{{ v }}"{% if v == step.method %} selected="selected"{% endif %}>{{ n }}</option>
-                    {% endfor %}
-                </select>
-                <span class="url js_show">{{ step.url }}</span>
-                <input type="text" class="js_edit edit_url" style="display:none" name="url" value="{{ step.url }}">
-            </div>
-
+                <div class="head">
+                    <span class="method js_show">{{ step.get_method_display }}</span>
+                    <select class="js_edit edit_method input-small" style="display:none" name="method" value="{{ step.method }}">
+                        {% for n, v in methods %}
+                        <option value="{{ v }}"{% if v == step.method %} selected="selected"{% endif %}>{{ n }}</option>
+                        {% endfor %}
+                    </select>
+                    <span class="url js_show">{{ step.url }}</span>
+                    <input type="text" class="js_edit edit_url" style="display:none" name="url" value="{{ step.url }}">
+                </div>
 
                 {% csrf_token %}
                 <input type="hidden" name="teststep" value="{{ step.pk }}">
@@ -54,11 +50,32 @@
     {% endfor %}
 </ol>
 
-<form class="add-step-form">
-    {{ add_step_form|bootstrap }}
+<form method="post" class="add_step_form js_params" style="display: none">
+  {% csrf_token %}
+  <h2>New Query</h2>
+  <input type="hidden" name="testcase" value="{{ testcase.pk }}">
+  <div class="head">
+    <span class="method js_show">{{ step.get_method_display }}</span>
+    <select class="js_edit edit_method input-small" style="display:none" name="method" value="{{ step.method }}">
+      {% for n, v in methods %}
+        <option value="{{ v }}"{% if v == "GET" %} selected="selected"{% endif %}>{{ n }}</option>
+      {% endfor %}
+    </select>
+    <span class="url js_show">{{ step.url }}</span>
+    <input type="text" class="js_edit edit_url" style="display:none" name="url" value="">
+  </div>
+
+  <table class="params table table-striped table-bordered">
+    <tr class="step_{{ name }} row_template" style="display:none">
+      <td class="name"><span></span><input type="hidden" name="" value="">{{ name }}</td>
+      <td class="value"><span></span></td>
+    </tr>
+  </table>
+  <button class="btn btn-primary btn-add-step" name="action" value="add_step">Add</button>
+  <button class="btn btn-cancel-add">Cancel</button>
 </form>
 
 <p class="add-buttons">
 <button class="add-test btn">Add Query</button>
-<button class="add-test btn">Add Assert</button>
+<button class="add-assert btn">Add Assert</button>
 </p>

@@ -21,7 +21,7 @@ Fortuitus.initEditTestcaseForm = function() {
     $('.testcase-header small').before(delbtn);
 };
 
-Fortuitus.initEditTestCaseStep = function() {
+Fortuitus.initEditTestStep = function() {
     $('.teststeps .head').each( function() {
         var $this = $(this);
         var btn = $('<button class="btn btn-mini btn-edit-testcase"><i class="icon-pencil"></i></button>');
@@ -35,11 +35,25 @@ Fortuitus.initEditTestCaseStep = function() {
 
         $this.append(btn);
     });
+
+    var $form = $('.add_step_form');
+    EditableTable.editMode($form, true);
+    $form.find('.js_edit').show();
+    $form.find('.js_show').hide();
+
+    $('.add-test').click(function(){
+        $('.add_step_form').show();
+        return false;
+    });
+    $('.btn-cancel-add').click(function(){
+        $('.add_step_form').hide();
+        return false;
+    });
 }
 
 $(document).ready(function() {
     Fortuitus.initEditTestcaseForm();
-    Fortuitus.initEditTestCaseStep();
+    Fortuitus.initEditTestStep();
 
 //    EditableTable.init($('.js_params'),
 //        function(input) {
