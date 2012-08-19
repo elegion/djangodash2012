@@ -9,6 +9,28 @@
     </form>
 </h2>
 
+<div class="well js-param-help param-help">
+<p>You can insert {placeholders} in parameter value.</p>
+<h3>Random</h3>
+<p>Generates random string. First param: char count.
+  Second param: any combination of <code>d</code> (digits),
+  <code>l</code> (ascii lower), <code>L</code> (ascii upper) and any other symbols.</p>
+<p>Examples:</p>
+  <p><code>{random}@touchin.ru</code> → <code>D13FA@touchin.ru</code></p>
+  <p><code>{random:3:d}</code> → <code>458</code></p>
+  <p><code>{random:4:dLl_}</code> → <code>1B_a</code></p>
+</div>
+
+<div class="well js-assert-help assert-help">
+  <p>Assert value is threated as plain string or response parameter of any step.</p>
+  <p>Examples:</p>
+  <p><code>200</code> — number 200</p>
+  <p><code>.status_code</code> — HTTP status code of previous step</p>
+  <p><code>0.status_code</code> — HTTP status code of first step</p>
+  <br>
+  <p><code>1.json.0.text</code> — field 'text' of first element of second step response</p>
+</div>
+
 <ol class="teststeps">
     {% for step in testcase.steps.all %}
         <li>

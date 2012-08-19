@@ -26,6 +26,7 @@ Fortuitus.initEditTestStep = function() {
         var $this = $(this);
         var btn = $('<button class="btn btn-mini btn-edit-testcase"><i class="icon-pencil"></i></button>');
         btn.click(function() {
+            $('.js-param-help').show();
             EditableTable.editMode($this.closest('form'), true);
             $this.parent().find('.js_edit').show();
             $this.parent().find('.js_show').hide();
@@ -43,10 +44,12 @@ Fortuitus.initEditTestStep = function() {
 
     $('.add-test').click(function(){
         $('.add_step_form').show();
+        $('.js-param-help').show();
         return false;
     });
     $('.btn-cancel-add').click(function(){
         $('.add_step_form').hide();
+        $('.js-param-help').hide();
         return false;
     });
 };
@@ -56,6 +59,7 @@ Fortuitus.initEditAssert = function() {
         var $this = $(this);
         var btn = $('<button class="btn btn-mini btn-edit-assert"><i class="icon-pencil"></i></button>');
         btn.click(function() {
+            $('.js-assert-help').show();
             $this.find('.js_edit').show();
             $this.find('.js_show').hide();
             $this.find('.js-btn-save-assert').show();
@@ -68,10 +72,12 @@ Fortuitus.initEditAssert = function() {
 
 
     $('.js-btn-add-assert').click(function(){
+        $('.js-assert-help').show();
         $('.js-add-assert-form').show();
         return false;
     });
     $('.js-btn-cancel-assert').click(function(){
+        $('.js-assert-help').hide();
         $('.js-add-assert-form').hide();
         return false;
     });
