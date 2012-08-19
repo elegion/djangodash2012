@@ -51,6 +51,7 @@ class TestCase(models.Model):
 
     class Meta:
         abstract = True
+        ordering = ('order',)
 
     def __unicode__(self):
         return self.name
@@ -71,6 +72,7 @@ class TestCaseStep(models.Model):
 
     class Meta:
         abstract = True
+        ordering = ('order',)
 
     def __unicode__(self):
         return '%s %s' % (self.method, self.url)
@@ -91,6 +93,7 @@ class TestCaseAssert(models.Model):
 
     class Meta:
         abstract = True
+        ordering = ('order',)
 
     def __unicode__(self):
         return '%s %s %s' % (self.lhs, self.operator, self.rhs)
