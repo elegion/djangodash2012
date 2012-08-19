@@ -97,6 +97,12 @@ def project(request, company_slug, project_slug):
             assertion.save()
             return redirect(request.path + '?testcase=%s' % testcase.slug)
 
+        if request.POST.get('action') == 'delete_assert':
+            assertion = TestCaseAssert.objects.get(pk=request.POST.get('assert'))
+            if assertion:
+                assertion.delete()
+            return redirect(request.path + '?testcase=%s' % testcase.slug)
+
         tc_form = TestCaseForm(request.POST, instance=testcase)
         if tc_form.is_valid():
             tc_form.save()

@@ -63,6 +63,7 @@ Fortuitus.initEditAssert = function() {
             $this.find('.js_edit').show();
             $this.find('.js_show').hide();
             $this.find('.js-btn-save-assert').show();
+            $this.find('.js-btn-delete-assert').show();
             btn.hide();
             return false;
         });

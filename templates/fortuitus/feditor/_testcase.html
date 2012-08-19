@@ -80,8 +80,10 @@
           <span class="operator">{{ assert.get_operator_display }}</span>
           <span class="rhs js_show">{{ assert.rhs }}</span>
           <input type="text" name="rhs" value="{{ assert.rhs }}" class="js_edit" style="display:none">
-          <button class="btn btn-primary js-btn-save-assert
-            btn-save-assert"name="action" value="save_assert" style="display:none">Save</button>
+          <button class="btn btn-primary js-btn-save-assert btn-save-assert"
+            name="action" value="save_assert" style="display:none">Save</button>
+          <button class="btn btn-delete js-btn-delete-assert btn-save-assert"
+            name="action" value="delete_assert" style="display:none">Delete</button>
         </form>
       </li>
     {% endfor %}
