@@ -18,11 +18,6 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.CharField')(default='', max_length=256),
                       keep_default=False)
 
-        # Adding field 'TestCase.exception'
-        db.add_column('frunner_testcase', 'exception',
-                      self.gf('django.db.models.fields.TextField')(null=True, blank=True),
-                      keep_default=False)
-
 
     def backwards(self, orm):
         # Deleting field 'TestCaseAssert.lhs_value'
@@ -30,9 +25,6 @@ class Migration(SchemaMigration):
 
         # Deleting field 'TestCaseAssert.rhs_value'
         db.delete_column('frunner_testcaseassert', 'rhs_value')
-
-        # Deleting field 'TestCase.exception'
-        db.delete_column('frunner_testcase', 'exception')
 
 
     models = {
