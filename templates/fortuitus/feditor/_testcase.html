@@ -1,3 +1,5 @@
+{% load bootstrap %}
+
 <h2 class="testcase-header">
     {{ testcase.name }} <small>{% if testcase.need_login %}needs login{% endif %}</small>
     <form class="delete_form" method="post">
@@ -19,6 +21,10 @@
         </span></li>
     {% endfor %}
 </ol>
+
+<form class="add-step-form">
+    {{ add_step_form|bootstrap }}
+</form>
 
 <p class="add-buttons">
 <button class="add-test btn">Add Query</button>

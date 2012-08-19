@@ -1,5 +1,68 @@
 {% extends "site_base.html" %}
 
-{% block content %}
-<h1>Fortuitus main page.</h1>
+{% block body %}
+<div class="container container-home" xmlns="http://www.w3.org/1999/html">
+
+<header class="masthead">
+    <h1>API Tester</h1>
+    <p>Amazing online tool for creating automatic acceptance tests for REST/JSON APIs.</p>
+    <p class="actions">
+    <a href="{% url feditor_project company='demo' project='twitter' %}" class="btn btn-large btn-primary">Try Demo</a>
+    <a href="#" class="btn btn-large btn-success" disabled="disabled">Free Sign Up</a>
+    </p>
+</header>
+
+<div class="menu menu-home">
+    <a href="">Sign In</a>
+</div>
+
+<div class="marketing">
+    <div class="row">
+        <div class="span6 item">
+            <!-- TODO big image on click -->
+            <img src="{{ STATIC_URL }}imgs/marketing_1.png" />
+            <h3>Easy to use</h3>
+            <p>API Tester was developer for <b>QA engineers</b> and <b>Project Managers</b>.
+                You don't need to know any programming languages.</p>
+        </div>
+
+        <div class="span6 item">
+            <!-- TODO big image on click -->
+            <img src="{{ STATIC_URL }}imgs/marketing_1.png" />
+            <h3>Clear reports</h3>
+            <p>Test runs generate well-looking reports. It's easy task to understand what's broken with API Tester</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="span6 item">
+            <!-- TODO big image on click -->
+            <img src="{{ STATIC_URL }}imgs/marketing_1.png" />
+            <h3>Ideal for mobile applications</h3>
+            <p>You can be absolutely shure who responsible for errors server-team or iPhone-app team.</p>
+        </div>
+
+        <div class="span6 item">
+            <!-- TODO big image on click -->
+            <img src="{{ STATIC_URL }}imgs/marketing_1.png" />
+            <h3>Share in one click</h3>
+            <p>Share test-fails with developers in one click.</p>
+        </div>
+    </div>
+</div>
+
+<div class="testimonials">
+    <h2>Testimonials</h2>
+    <div class="row">
+        <div class="span6">
+            <img src="{{ STATIC_URL }}imgs/anyap.gif" />
+            <p>«It's fucking awesome! API Tester saved my life and relationship with clients. No more recriminations.»</p>
+            <p class="author">Anna Parfenova, account manager <a href="http://touchinstinct.com">Touch Instinct</a> </p>
+        </div>
+    </div>
+</div>
+
+</div>
+
+{% include '_footer.html' %}
 {% endblock %}

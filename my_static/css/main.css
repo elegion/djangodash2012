@@ -1,11 +1,99 @@
-.content {
+/* Home page */
+/*@import url(http://fonts.googleapis.com/css?family=Jura&subset=latin,cyrillic-ext);*/
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:400,700&subset=latin,cyrillic-ext);
+@import url(http://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700&subset=latin,cyrillic-ext);
+.masthead {
+    /*font-family: 'Jura', sans-serif;*/
+    font-family: 'Open Sans', sans-serif;
+    text-align: center;
+    margin: 5em auto 7em auto;
+}
+    .masthead h1 {
+        font-size: 50px;
+        margin: 0 0 0.5em 0;
+        font-family: 'Ubuntu Mono', sans-serif; /* TODO: replace with picture*/
+    }
+    .masthead p {
+        font-size: 18px;
+        line-height: 1.4em;
+    }
+    .masthead .actions {
+        margin: 2em 0 0 0;
+        text-align: center;
+    }
+        .masthead .actions .btn {
+            margin: 0 0.5em;
+        }
+        .masthead .actions .btn-large {
+            font-size: 18px;
+            font-weight: normal;
+            padding: 7px 34px;
+            -webkit-border-radius: 6px;
+            -moz-border-radius: 6px;
+            border-radius: 6px;
+        }
+
+.marketing {
+}
+    .marketing h3 {
+        margin: 0 0 0.5em 0;
+    }
+    .marketing .item {
+        margin-bottom: 3em;
+    }
+    .marketing p {
+        margin-right: 0;
+    }
+    .marketing img {
+        width: 140px;
+        height: 80px;
+        background: #EEE;
+        float: left;
+        margin: 7px 1em 2em 30px;
+        border: 3px solid #EEE;
+    }
+
+.testimonials {
+    padding-left: 30px;
+    margin: 1.5em 0 0 0;
+}
+    .testimonials h2 {
+        margin: 0 0 0.6em 0;
+    }
+    .testimonials img {
+        float: left;
+        margin: 7px 1em 2em 0;
+        border: 3px solid #EEE;
+    }
+    .testimonials p {
+        margin: 12px 20px 0 0;
+    }
+    .testimonials p.author {
+        font-size: 13px;
+        font-style: normal;
+    }
+
+.menu-home {
+    position: absolute;
+    right: 2em;
+    top: 1em;
+}
+body {
+    font-family: 'Open Sans', sans-serif;
+}
+.container-home {
+    padding-bottom: 60px;
+}
+/* /Home page */
+.navbar-inner {
+    border-radius: 0;
+    -moz-border-radius: 0;
+    -webkit-border-radius: 0;
+}
+.container-fluid {
     padding-bottom: 80px; /*footer*/
 }
 .footer {
-    position:absolute;
-    bottom:0;
-    left: 0;
-    right: 0;
     height: 25px;
     border-top: 1px solid #999;
     padding: 1em 2em;

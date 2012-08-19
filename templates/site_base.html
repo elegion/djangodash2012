@@ -19,12 +19,5 @@
   <div class="container-fluid">
     {% block content %}{% endblock %}
   </div>
-  <footer class="footer">
-    <p>
-      <a href="http://djangodash.com">DjangoDash 2012</a>.
-      <a href="https://twitter.com/alarin_ru">@alarin_ru</a>,
-      <a href="https://twitter.com/dmedvinsky">@dmedvinsky</a> and
-      <a href="https://twitter.com/glyuck">@glyuck</a>.
-    </p>
-  </footer>
+  {% include '_footer.html' %}
 {% endblock %}
