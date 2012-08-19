@@ -12,7 +12,7 @@ def add(x, y):
 
 
 @task()
-def run_tests(test_id):
+def run_tests(project_id):
     """
     A task that actually runs the API testing.
 
@@ -20,19 +20,23 @@ def run_tests(test_id):
     tests.
 
     """
-    # Obtain testcase to run
-    etest = emodels.TestCase.objects.get(pk=test_id)
+    # Obtain project to run
+    project = emodels.TestProject.objects.get(pk=project_id)
 
-    # Now copy test and all related data
-    kwargs = model_to_dict(etest, exclude=['id', 'project'])
-    rtest = rmodels.TestCase.objects.create(project=etest.project, **kwargs)
+    testrun = rmodels.TestRun.objects.create(project=project,
+                                             base_url=project.base_url,
+                                             common_params=project.common_params)
+    # Now copy all testcases and related data
+    for etest in project.testcases.all():
+        kwargs = model_to_dict(etest, exclude=['id', 'project'])
+        rtest = rmodels.TestCase.objects.create(testrun=testrun, **kwargs)
 
-    for estep in etest.steps.all():
-        kwargs = model_to_dict(estep, exclude=['testcase'])
-        rstep = rmodels.TestCaseStep.objects.create(testcase=rtest, **kwargs)
+        for estep in etest.steps.all():
+            kwargs = model_to_dict(estep, exclude=['testcase'])
+            rstep = rmodels.TestCaseStep.objects.create(testcase=rtest, **kwargs)
 
-        for assertion in estep.assertions.all():
-            kwargs = model_to_dict(assertion, exclude=['step'])
-            rmodels.TestCaseAssert.objects.create(step=rstep, **kwargs)
+            for assertion in estep.assertions.all():
+                kwargs = model_to_dict(assertion, exclude=['step'])
+                rmodels.TestCaseAssert.objects.create(step=rstep, **kwargs)
 
-    rtest.run()
+    testrun.run()

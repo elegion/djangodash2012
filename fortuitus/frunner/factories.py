@@ -4,10 +4,16 @@ from fortuitus.feditor.factories import TestProjectF
 from fortuitus.frunner import models
 
 
+class TestRunF(factory.Factory):
+    FACTORY_FOR = models.TestRun
+
+    project = factory.SubFactory(TestProjectF)
+
+
 class TestCaseF(factory.Factory):
     FACTORY_FOR = models.TestCase
 
-    project = factory.SubFactory(TestProjectF)
+    testrun = factory.SubFactory(TestRunF)
     name = factory.Sequence(lambda n: 'TestCase #%s' % n)
 
 

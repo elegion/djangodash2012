@@ -28,10 +28,10 @@ class RunTestsTaskTestCase(BaseTestCase):
         """
         Should raise emodels.TestCase.DoesNotExist if test case not found.
         """
-        with self.assertRaises(emodels.TestCase.DoesNotExist):
+        with self.assertRaises(emodels.TestProject.DoesNotExist):
             run_tests(10000)
 
-    @mock.patch('fortuitus.frunner.models.TestCase.run', mock.Mock())
+    @mock.patch('fortuitus.frunner.models.TestRun.run', mock.Mock())
     def test_copies_and_runs_testcase(self):
         """
         Should copy TestCase (and all related models) int
@@ -47,7 +47,7 @@ class RunTestsTaskTestCase(BaseTestCase):
 
         run_tests(test_case.pk)
 
-        rmodels.TestCase.run.assert_called_once_with()
+        rmodels.TestRun.run.assert_called_once_with()
 
         self.assertEqual(1, rmodels.TestCase.objects.count())
         test_case_copy = rmodels.TestCase.objects.all()[0]
@@ -75,7 +75,7 @@ class RunTestsTaskTestCase(BaseTestCase):
         self.assertEqual(assertion_2_1.rhs, assertion_2_1_copy.rhs)
         self.assertEqual(assertion_2_1.operator, assertion_2_1_copy.operator)
 
-    @mock.patch('fortuitus.frunner.models.TestCase.run', mock.Mock())
+    @mock.patch('fortuitus.frunner.models.TestRun.run', mock.Mock())
     def test_test_cases_can_be_duplicated(self):
         """
         Should copy same TestCase twice without raising "primary key must be
@@ -84,11 +84,11 @@ class RunTestsTaskTestCase(BaseTestCase):
         count = rmodels.TestCase.objects.all().count
         test_case = efactories.TestCaseF.create()
         self.assertEqual(count(), 0)
-        run_tests(test_case.pk)
+        run_tests(test_case.project_id)
         self.assertEqual(count(), 1)
-        run_tests(test_case.pk)
+        run_tests(test_case.project_id)
         self.assertEqual(count(), 2)
-        rmodels.TestCase.run.assert_has_calls([mock.call(), mock.call()])
+        rmodels.TestRun.run.assert_has_calls([mock.call(), mock.call()])
 
 
 class IntegrationTestCase(BaseTestCase):
@@ -98,6 +98,7 @@ class IntegrationTestCase(BaseTestCase):
         start = timezone.now()
 
         testcase = efactories.TestCaseF.create()
+        efactories.TestCaseF.create(project=testcase.project)
         step1 = efactories.TestCaseStepF.create(testcase=testcase)
         step2 = efactories.TestCaseStepF.create(testcase=testcase, url='groups.json')
         efactories.TestCaseAssertF.create(step=step2, lhs='.status_code', rhs='200', operator='eq')
@@ -111,11 +112,19 @@ class IntegrationTestCase(BaseTestCase):
             else:
                 raise AssertionError('Unexpected requests.request arguments: %s, %s' % (args, kwargs))
         with mock.patch('requests.request', mock.Mock(side_effect=my_side_effect)):
-            run_tests(testcase.pk)
+            run_tests(testcase.project_id)
             self.assertEqual(2, requests.request.call_count)
 
-        self.assertEqual(1, rmodels.TestCase.objects.count())
+        self.assertEqual(1, rmodels.TestRun.objects.count())
+        self.assertObject(rmodels.TestRun.objects.all()[0],
+                          result=rmodels.TestResult.success)
+
+        self.assertEqual(2, rmodels.TestCase.objects.count())
         self.assertObject(rmodels.TestCase.objects.all()[0],
+                          start_date__gte=start,
+                          end_date__gte=start,
+                          result=rmodels.TestResult.success)
+        self.assertObject(rmodels.TestCase.objects.all()[1],
                           start_date__gte=start,
                           end_date__gte=start,
                           result=rmodels.TestResult.success)
@@ -127,6 +136,7 @@ class IntegrationTestCase(BaseTestCase):
         start = timezone.now()
 
         testcase = efactories.TestCaseF.create()
+        efactories.TestCaseF.create(project=testcase.project)
         step1 = efactories.TestCaseStepF.create(testcase=testcase, order=1)
         efactories.TestCaseAssertF.create(step=step1, lhs='.text', rhs='Wazup!', operator='eq', order=1)
         efactories.TestCaseAssertF.create(step=step1, lhs='.status_code', rhs='200', operator='eq', order=2)
@@ -138,11 +148,19 @@ class IntegrationTestCase(BaseTestCase):
 
         self.assertEqual(1, requests.request.call_count)
 
-        self.assertEqual(1, rmodels.TestCase.objects.count())
+        self.assertEqual(1, rmodels.TestRun.objects.count())
+        self.assertObject(rmodels.TestRun.objects.all()[0],
+                          result=rmodels.TestResult.fail)
+
+        self.assertEqual(2, rmodels.TestCase.objects.count())
         self.assertObject(rmodels.TestCase.objects.all()[0],
                           start_date__gte=start,
                           end_date__gte=start,
                           result=rmodels.TestResult.fail)
+        self.assertObject(rmodels.TestCase.objects.all()[1],
+                          start_date__gte=start,
+                          end_date__gte=start,
+                          result=rmodels.TestResult.success)
         self.assertEqual(2, rmodels.TestCaseStep.objects.count())
         self.assertObject(rmodels.TestCaseStep.objects.all()[0],
                           result=rmodels.TestResult.fail,
@@ -187,7 +205,7 @@ class TestCaseModelTestCase(BaseTestCase):
         rfactories.TestCaseStepF.create(testcase=test_case)
         rfactories.TestCaseStepF.create(testcase=test_case)
 
-        test_case.run()
+        test_case.run(test_case.testrun)
 
         self.assertEqual(2, rmodels.TestCaseStep.run.call_count)
         # TODO: fix test
@@ -207,7 +225,7 @@ class TestCaseModelTestCase(BaseTestCase):
         start = timezone.now()
         test_case = rfactories.TestCaseF.create()
 
-        test_case.run()
+        test_case.run(test_case.testrun)
 
         self.assertEqual(0, rmodels.TestCaseStep.run.call_count)
 
@@ -226,7 +244,7 @@ class TestCaseModelTestCase(BaseTestCase):
         rfactories.TestCaseStepF.create(testcase=test_case)
         rfactories.TestCaseStepF.create(testcase=test_case)
 
-        test_case.run()
+        test_case.run(test_case.testrun)
 
         self.assertEqual(1, rmodels.TestCaseStep.run.call_count)
 
@@ -246,7 +264,7 @@ class TestCaseModelTestCase(BaseTestCase):
         rfactories.TestCaseStepF.create(testcase=test_case)
         rfactories.TestCaseStepF.create(testcase=test_case)
 
-        test_case.run()
+        test_case.run(test_case.testrun)
 
         self.assertObjectUpdated(test_case,
                                  start_date__gte=start,
@@ -270,8 +288,8 @@ class TestCaseStepModelTestCase(BaseTestCase):
         rfactories.TestCaseAssertF(step=step)
         rfactories.TestCaseAssertF(step=step)
 
-        res = step.run(step.testcase.project, step.testcase, [])
-        requests.request.assert_called_once_with(step.method, '%s%s' % (step.testcase.project.base_url, step.url))
+        res = step.run(step.testcase.testrun, step.testcase, [])
+        requests.request.assert_called_once_with(step.method, '%s%s' % (step.testcase.testrun.base_url, step.url))
 
         self.assertEqual(3, rmodels.TestCaseAssert.do_assertion.call_count)
         rmodels.TestCaseAssert.do_assertion.assert_called_with([response])
@@ -295,7 +313,7 @@ class TestCaseStepModelTestCase(BaseTestCase):
 
         step = rfactories.TestCaseStepF()
 
-        step.run(step.testcase.project, step.testcase, [])
+        step.run(step.testcase.testrun, step.testcase, [])
 
         self.assertEqual(0, rmodels.TestCaseAssert.do_assertion.call_count)
 
@@ -313,7 +331,7 @@ class TestCaseStepModelTestCase(BaseTestCase):
         rfactories.TestCaseAssertF(step=step)
         rfactories.TestCaseAssertF(step=step)
 
-        res = step.run(step.testcase.project, step.testcase, [])
+        res = step.run(step.testcase.testrun, step.testcase, [])
         self.assertFalse(res)
 
         self.assertEqual(1, rmodels.TestCaseAssert.do_assertion.call_count)
@@ -332,7 +350,7 @@ class TestCaseStepModelTestCase(BaseTestCase):
         rfactories.TestCaseAssertF(step=step)
 
         with self.assertRaises(requests.Timeout):
-            step.run(step.testcase.project, step.testcase, [])
+            step.run(step.testcase.testrun, step.testcase, [])
 
         self.assertEqual(0, rmodels.TestCaseAssert.do_assertion.call_count)
 

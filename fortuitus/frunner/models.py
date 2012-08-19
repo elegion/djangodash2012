@@ -4,6 +4,7 @@ from jsonfield import JSONField
 import requests
 
 from fortuitus.feditor import models_base
+from fortuitus.feditor.dbfields import ParamsField
 from fortuitus.feditor.models import TestProject
 from fortuitus.frunner.resolvers import (resolve_lhs, resolve_rhs,
                                          resolve_operator)
@@ -23,13 +24,13 @@ TEST_CASE_RESULT_CHOICES = (
 )
 
 
-class TestCase(models_base.TestCase):
-    """
-    Contains information about actual test case run.
-
-    See also :model:`feditor.TestCase`
+class TestRun(models.Model):
+    """ Contains information about single project tests run
     """
     project = models.ForeignKey(TestProject, related_name='test_runs')
+
+    base_url = models.URLField()
+    common_params = ParamsField(blank=True, null=True)
 
     start_date = models.DateTimeField(null=True, blank=True)
     end_date = models.DateTimeField(null=True, blank=True)
@@ -37,12 +38,34 @@ class TestCase(models_base.TestCase):
                               blank=False, null=True)
 
     def run(self):
+        for testcase in self.testcases.all():
+            testcase.run(self)
+            if testcase.result != TestResult.success:
+                self.result = TestResult.fail
+        self.result = self.result or TestResult.success
+        self.save()
+
+
+class TestCase(models_base.TestCase):
+    """
+    Contains information about actual test case run.
+
+    See also :model:`feditor.TestCase`
+    """
+    testrun = models.ForeignKey(TestRun, related_name='testcases')
+
+    start_date = models.DateTimeField(null=True, blank=True)
+    end_date = models.DateTimeField(null=True, blank=True)
+    result = models.CharField(max_length=10, choices=TEST_CASE_RESULT_CHOICES,
+                              blank=False, null=True)
+
+    def run(self, testrun):
         self.start_date = timezone.now()
 
         responses = []
         for step in self.steps.all():
             try:
-                response = step.run(self.project, self, responses)
+                response = step.run(testrun, self, responses)
                 if not response:
                     break
             except Exception, e:
@@ -79,10 +102,10 @@ class TestCaseStep(models_base.TestCaseStep):
     response_headers = JSONField(null=True, blank=True)
     response_body = models.TextField(null=True, blank=True)
 
-    def run(self, project, testcase, responses):
+    def run(self, testrun, testcase, responses):
         self.start_date = timezone.now()
         try:
-            r = requests.request(self.method, '%s%s' % (project.base_url, self.url))
+            r = requests.request(self.method, '%s%s' % (testrun.base_url, self.url))
 
             self.response_code = r.status_code
             self.response_body = r.text
