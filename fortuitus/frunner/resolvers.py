@@ -1,6 +1,7 @@
 import operator
 from operator import attrgetter, itemgetter
 
+from core.functional import compose
 from django.utils.importlib import import_module
 
 
@@ -28,7 +29,12 @@ def resolve_lhs(value, responses):
     prop_parts = property_path.split('.')
     ref = response
     for part in prop_parts:
-        func = itemgetter if isinstance(ref, dict) else attrgetter
+        if isinstance(ref, dict):
+            func = itemgetter
+        elif isinstance(ref, list):
+            func = compose(itemgetter, int)
+        else:
+            func = attrgetter
         ref = func(part)(ref)
     return ref
 
