@@ -4,7 +4,7 @@ import urlparse
 from .settings import *  # NOQA
 
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 
