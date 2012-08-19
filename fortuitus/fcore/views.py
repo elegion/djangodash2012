@@ -11,6 +11,10 @@ from fortuitus.feditor import models as emodels
 
 def home(request):
     """ Home page. """
+    if request.user.is_authenticated():
+        slug = request.user.fortuitusprofile.company.slug
+        if slug:
+            return redirect('fcore_projects_list', company_slug=slug)
     return TemplateResponse(request, 'fortuitus/fcore/home.html')
 
 
