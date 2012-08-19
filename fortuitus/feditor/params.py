@@ -3,9 +3,10 @@ import json
 import re
 
 from fortuitus.feditor.resolvers import resolve_param
+from django.utils.datastructures import SortedDict
 
 
-class Params(dict):
+class Params(SortedDict):
     """ Represents query parameters, JSON serializable."""
     def dumps(self):
         """ Serialize parameters in JSON format. """
@@ -16,8 +17,8 @@ class Params(dict):
         """ Load parameters from JSON format. """
         data = json.loads(s)
         params = Params()
-        for name, value in data.items():
-            params[name] = value
+        for name in sorted(data):
+            params[name] = data[name]
         return params
 
     def resolve(self, context={}):
