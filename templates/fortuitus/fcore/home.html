@@ -8,12 +8,18 @@
     <p>Amazing online tool to create automatic acceptance tests for REST/JSON APIs.</p>
     <p class="actions">
       <a href="{% url feditor_project company='demo' project='twitter' %}" class="btn btn-large btn-primary">Try Demo</a>
-      <a href="{% url signup %}" class="btn btn-large btn-success">Free Sign Up</a>
+      {% if not user.is_authenticated %}
+        <a href="{% url signup %}" class="btn btn-large btn-success">Free Sign Up</a>
+      {% endif %}
     </p>
   </header>
 
   <div class="menu menu-home">
-    <a href="{% url login %}">Sign In</a>
+    {% if user.is_authenticated %}
+      <a href="{% url logout %}">Sign Out</a>
+    {% else %}
+      <a href="{% url login %}">Sign In</a>
+    {% endif %}
   </div>
 
   {% if messages %}
