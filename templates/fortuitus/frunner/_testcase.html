@@ -41,7 +41,7 @@
         </div>
         <div class="response-wrapper js_response_wrapper">
           {% if step.response_headers %}
-            <table class="params js_params table table-striped table-bordered">
+            <table class="headers table table-striped table-bordered">
               <thead>
                 <tr>
                   <th>Header</th>
@@ -60,7 +60,7 @@
           {% endif %}
           {% if step.response_body %}
             <h4>Response body</h4>
-            <div class="well">{{ step.response_body }}</div>
+            <pre><code>{{ step.response_body }}</code></pre>
           {% else %}
             <h4>Response body is empty</h4>
           {% endif %}

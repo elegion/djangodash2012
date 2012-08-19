@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{{ STATIC_URL }}css/lib/bootstrap/css/bootstrap.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}css/main.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}css/frunner.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/lib/github.css">
     {% endcompress %}
   </head>
   <body>
@@ -17,6 +18,8 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
     <script>window.jQuery || document.write('<script src="{{ STATIC_URL }}js/lib/jquery-1.8.0.min.js"><\/script>')</script>
     {% compress js %}
+    <script src="{{ STATIC_URL }}js/lib/highlight.pack.js"></script>
+    <script src="{{ STATIC_URL }}js/lib/vkbeautify.0.98.01.beta.js"></script>
     <script src="{{ STATIC_URL }}js/lib/bootstrap.js"></script>
     <script src="{{ STATIC_URL }}js/editabletable.js"></script>
     <script src="{{ STATIC_URL }}js/main.js"></script>
