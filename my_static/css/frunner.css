@@ -1,3 +1,25 @@
+.testrun-name.result-pending {
+  padding-left: 20px;
+  margin-left: -20px;
+  background: transparent url(../imgs/throbber-small.gif) no-repeat 0 50%;
+}
+
+.testcases li .result-symbol {
+  font-size: 200%;
+  vertical-align: middle;
+}
+  .testcases li.result-fail .result-symbol,
+  .testcases li.result-error .result-symbol {
+    color: #a00;
+  }
+  .testcases li.result-success .result-symbol {
+    color: #0a0;
+  }
+  .testcases li.result- .result-symbol,
+  .testcases li.result-pending .result-symbol {
+    color: #aaa;
+  }
+
 .testcase-header .result-symbol {
   font-size: 200%;
   vertical-align: middle;

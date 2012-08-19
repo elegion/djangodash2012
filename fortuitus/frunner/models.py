@@ -106,16 +106,6 @@ class TestCase(models_base.TestCase):
                               blank=False, null=True)
     exception = models.TextField(blank=True, null=True)
 
-    def result_symbol(self):
-        if self.result == TestResult.success:
-            return u'\u2022'
-        elif self.result == TestResult.error:
-            return u'E'
-        elif self.result == TestResult.fail:
-            return u'F'
-        else:
-            return u'\u00A0'
-
     def result_str(self):
         return self.result or TestResult.pending
 
