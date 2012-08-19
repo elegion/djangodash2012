@@ -4,6 +4,14 @@ from fortuitus.feditor.models import TestProject, TestCase
 from fortuitus.feditor.models import TestCaseAssert, TestCaseStep
 
 
+class TestCaseStepInline(admin.StackedInline):
+    model = TestCaseStep
+
+
+class TestCaseAdmin(admin.ModelAdmin):
+    inlines = [TestCaseStepInline]
+
+
 class TestCaseAssertInline(admin.StackedInline):
     """ Test case assertions administration. """
     model = TestCaseAssert
@@ -19,5 +27,5 @@ class TestCaseStepAdmin(admin.ModelAdmin):
 
 
 admin.site.register(TestProject)
-admin.site.register(TestCase)
+admin.site.register(TestCase, TestCaseAdmin)
 admin.site.register(TestCaseStep, TestCaseStepAdmin)
