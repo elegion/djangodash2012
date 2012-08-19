@@ -179,31 +179,6 @@ class TestRunModelTestCase(BaseTestCase):
         self.assertEqual(assertion_2_1.rhs, assertion_2_1_copy.rhs)
         self.assertEqual(assertion_2_1.operator, assertion_2_1_copy.operator)
 
-    def test_test_cases_can_be_duplicated(self):
-        """
-        Should copy same TestProject twice without raising "primary key must be
-        unique" IntegrityError.
-        """
-        test_case = efactories.TestCaseF.create()
-        step = efactories.TestCaseStepF.create(testcase=test_case)
-        efactories.TestCaseStepF.create(testcase=test_case)
-        efactories.TestCaseAssertF.create(step=step)
-        efactories.TestCaseAssertF.create(step=step)
-
-        self.assertEqual(rmodels.TestRun.objects.all().count(), 0)
-
-        rmodels.TestRun.create_from_project(test_case.project)
-        self.assertEqual(1, rmodels.TestRun.objects.all().count())
-        self.assertEqual(1, rmodels.TestCase.objects.all().count())
-        self.assertEqual(2, rmodels.TestCaseStep.objects.all().count())
-        self.assertEqual(2, rmodels.TestCaseAssert.objects.all().count())
-
-        rmodels.TestRun.create_from_project(test_case.project)
-        self.assertEqual(2, rmodels.TestRun.objects.all().count())
-        self.assertEqual(2, rmodels.TestCase.objects.all().count())
-        self.assertEqual(4, rmodels.TestCaseStep.objects.all().count())
-        self.assertEqual(4, rmodels.TestCaseAssert.objects.all().count())
-
 
 class TestCaseModelTestCase(BaseTestCase):
     @mock.patch('fortuitus.frunner.models.TestCaseStep.run', mock.Mock(return_value=True))
@@ -477,3 +452,45 @@ class RunnerViewsTestCase(TestCase):
         self.assertEqual(1, rmodels.TestRun.objects.count())
         self.assertRedirects(response, reverse('frunner_testrun', args=[case.project_id,
                                                                         rmodels.TestRun.objects.all()[0].pk]))
+
+
+class RegressionTestCase(BaseTestCase):
+    """ Tests for old bugs
+    """
+    @mock.patch('fortuitus.frunner.models.TestCaseStep.run', mock.Mock(return_value=ResponseF(status_code=404)))
+    def test_testcase_4xx_response(self):
+        """ Test case should not mark itself as failed if receive response with code >= 400
+        """
+        test_case = rfactories.TestCaseF.create()
+        rfactories.TestCaseStepF.create(testcase=test_case)
+
+        test_case.run(test_case.testrun)
+
+        self.assertEqual(1, rmodels.TestCaseStep.run.call_count)
+        self.assertObjectUpdated(test_case,
+                                 result=rmodels.TestResult.success)
+
+    def test_test_cases_can_be_duplicated(self):
+        """
+        Should copy same TestProject twice without raising "primary key must be
+        unique" IntegrityError.
+        """
+        test_case = efactories.TestCaseF.create()
+        step = efactories.TestCaseStepF.create(testcase=test_case)
+        efactories.TestCaseStepF.create(testcase=test_case)
+        efactories.TestCaseAssertF.create(step=step)
+        efactories.TestCaseAssertF.create(step=step)
+
+        self.assertEqual(rmodels.TestRun.objects.all().count(), 0)
+
+        rmodels.TestRun.create_from_project(test_case.project)
+        self.assertEqual(1, rmodels.TestRun.objects.all().count())
+        self.assertEqual(1, rmodels.TestCase.objects.all().count())
+        self.assertEqual(2, rmodels.TestCaseStep.objects.all().count())
+        self.assertEqual(2, rmodels.TestCaseAssert.objects.all().count())
+
+        rmodels.TestRun.create_from_project(test_case.project)
+        self.assertEqual(2, rmodels.TestRun.objects.all().count())
+        self.assertEqual(2, rmodels.TestCase.objects.all().count())
+        self.assertEqual(4, rmodels.TestCaseStep.objects.all().count())
+        self.assertEqual(4, rmodels.TestCaseAssert.objects.all().count())

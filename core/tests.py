@@ -34,7 +34,7 @@ class BaseTestCase(TestCase):
             self.assertModel(User, 1, username='bob')
 
         """
-        self.assertObject(model.objects.get(pk=pk))
+        self.assertObject(model.objects.get(pk=pk), **params)
 
     def assertObjectUpdated(self, old_instance, **params):
         """

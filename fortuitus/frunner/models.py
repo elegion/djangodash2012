@@ -102,7 +102,7 @@ class TestCase(models_base.TestCase):
         for step in self.steps.all():
             try:
                 response = step.run(testrun, self, responses)
-                if not response:
+                if response is False:
                     logger.warn('TestCase %s received False response', self)
                     break
             except Exception, e:

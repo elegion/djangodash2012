@@ -1,4 +1,5 @@
 import factory
+import mock
 import requests
 
 class ResponseF(factory.Factory):
@@ -13,6 +14,7 @@ class ResponseF(factory.Factory):
     def _prepare(cls, create, **kwargs):
         r = requests.Response()
         kwargs['_content'] = kwargs.pop('content')
+        r.raw = mock.Mock()
         for attr, value in kwargs.iteritems():
             setattr(r, attr, value)
         return r
