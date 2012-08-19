@@ -6,12 +6,12 @@ from fortuitus.feditor.dbfields import ParamsField
 
 
 class Method:
-    OPTIONS = 'OPTIONS'
-    HEAD = 'HEAD'
     GET = 'GET'
     POST = 'POST'
-    PUT = 'PUT'
     DELETE = 'DELETE'
+    OPTIONS = 'OPTIONS'
+    HEAD = 'HEAD'
+    PUT = 'PUT'
     PATCH = 'PATCH'
 
 

@@ -85,6 +85,10 @@ body {
     padding-bottom: 60px;
 }
 /* /Home page */
+.navbar .brand {
+    font-family: 'Ubuntu Mono', sans-serif; /* TODO: replace with picture*/
+    color: #FFF;
+}
 .navbar-inner {
     border-radius: 0;
     -moz-border-radius: 0;
