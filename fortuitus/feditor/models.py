@@ -1,5 +1,6 @@
 from autoslug.fields import AutoSlugField
 from django.db import models
+from django.conf import settings
 
 from fortuitus.fcore.models import Company
 from fortuitus.feditor import models_base
@@ -77,6 +78,11 @@ class TestCase(models_base.TestCase):
     modified = models.DateTimeField(auto_now=True)
 
     objects = TestCaseManager()
+
+    def save(self, force_insert=False, force_update=False, using=None):
+        """User autoslugfield is crap. Need to do it by hands"""
+        self.slug = settings.SLUGIFY_FUNCTION(self.name)
+        super(TestCase, self).save(force_insert, force_update, using)
 
     class Meta():
         ordering = ('created',)

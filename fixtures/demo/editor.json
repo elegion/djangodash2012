@@ -1,0 +1,274 @@
+[
+  {
+    "pk": 1,
+    "model": "feditor.testproject",
+    "fields": {
+      "name": "Twitter",
+      "created": "2012-08-19T05:04:35.044Z",
+      "company": 1,
+      "base_url": "http://api.twitter.com/1/",
+      "common_params": "{}",
+      "modified": "2012-08-19T05:04:35.044Z",
+      "slug": "twitter"
+    }
+  },
+  {
+    "pk": 2,
+    "model": "feditor.testproject",
+    "fields": {
+      "name": "Github",
+      "created": "2012-08-19T05:06:30.647Z",
+      "company": 1,
+      "base_url": "https://api.github.com/",
+      "common_params": "{}",
+      "modified": "2012-08-19T05:06:30.647Z",
+      "slug": "github"
+    }
+  },
+  {
+    "pk": 3,
+    "model": "feditor.testproject",
+    "fields": {
+      "name": "demo org 2 project",
+      "created": "2012-08-19T05:06:54.278Z",
+      "company": 2,
+      "base_url": "http://apitester.com/api",
+      "common_params": "{}",
+      "modified": "2012-08-19T05:06:54.278Z",
+      "slug": "demo-org-2-project"
+    }
+  },
+  {
+    "pk": 1,
+    "model": "feditor.testcase",
+    "fields": {
+      "login_options": {
+        "consumer_secret": "TnnqvtkvoJqBkFMQnfoWvVxb64ERtHg1AX6mFaEo9hM",
+        "access_token": "767416465-lrGQyTH8xX8zMZEMzCv8s1RKuAqDKXs67HKHAEPM",
+        "consumer_key": "0i4uIl0o03YxeRU6h93pQ",
+        "access_token_secret": "5xHHCCP3hjTenGFOgWyEFiWg0kkKWuZpnO6MvIjoE"
+      },
+      "created": "2012-08-18T10:00:00Z",
+      "modified": "2012-08-19T11:48:02.767Z",
+      "slug": "user-timeline",
+      "project": 1,
+      "login_type": "oauth",
+      "order": 1,
+      "name": "user_timeline"
+    }
+  },
+  {
+    "pk": 2,
+    "model": "feditor.testcase",
+    "fields": {
+      "login_options": {
+        "consumer_secret": "TnnqvtkvoJqBkFMQnfoWvVxb64ERtHg1AX6mFaEo9hM",
+        "access_token": "767416465-lrGQyTH8xX8zMZEMzCv8s1RKuAqDKXs67HKHAEPM",
+        "consumer_key": "0i4uIl0o03YxeRU6h93pQ",
+        "access_token_secret": "5xHHCCP3hjTenGFOgWyEFiWg0kkKWuZpnO6MvIjoE"
+      },
+      "created": "2012-08-18T10:00:00Z",
+      "modified": "2012-08-19T16:35:21.837Z",
+      "slug": "post-tweet",
+      "project": 1,
+      "login_type": "oauth",
+      "order": 1,
+      "name": "post tweet"
+    }
+  },
+  {
+    "pk": 3,
+    "model": "feditor.testcase",
+    "fields": {
+      "login_options": null,
+      "created": "2012-08-19T05:13:29.210Z",
+      "modified": "2012-08-19T05:13:29.210Z",
+      "slug": "get-commits",
+      "project": 2,
+      "login_type": "none",
+      "order": 1,
+      "name": "get_commits"
+    }
+  },
+  {
+    "pk": 4,
+    "model": "feditor.testcase",
+    "fields": {
+      "login_options": {
+        "consumer_secret": "TnnqvtkvoJqBkFMQnfoWvVxb64ERtHg1AX6mFaEo9hM",
+        "access_token": "767416465-lrGQyTH8xX8zMZEMzCv8s1RKuAqDKXs67HKHAEPM",
+        "consumer_key": "0i4uIl0o03YxeRU6h93pQ",
+        "access_token_secret": "5xHHCCP3hjTenGFOgWyEFiWg0kkKWuZpnO6MvIjoE"
+      },
+      "created": "2012-08-19T22:20:14.305Z",
+      "modified": "2012-08-19T22:49:19.540Z",
+      "slug": "tweet-mention-and-tag",
+      "project": 1,
+      "login_type": "oauth",
+      "order": 2,
+      "name": "tweet mention and tag"
+    }
+  },
+  {
+    "pk": 5,
+    "model": "feditor.testcase",
+    "fields": {
+      "login_options": {
+        "consumer_secret": "TnnqvtkvoJqBkFMQnfoWvVxb64ERtHg1AX6mFaEo9hM",
+        "access_token": "767416465-lrGQyTH8xX8zMZEMzCv8s1RKuAqDKXs67HKHAEPM",
+        "consumer_key": "0i4uIl0o03YxeRU6h93pQ",
+        "access_token_secret": "5xHHCCP3hjTenGFOgWyEFiWg0kkKWuZpnO6MvIjoE"
+      },
+      "created": "2012-08-19T22:49:31.275Z",
+      "modified": "2012-08-19T22:50:01.945Z",
+      "slug": "double-tweet",
+      "project": 1,
+      "login_type": "oauth",
+      "order": 2,
+      "name": "double tweet"
+    }
+  },
+  {
+    "pk": 2,
+    "model": "feditor.testcasestep",
+    "fields": {
+      "url": "statuses/update.json",
+      "testcase": 2,
+      "params": "{\"status\": \"{random:140}\"}",
+      "order": 0,
+      "method": "POST"
+    }
+  },
+  {
+    "pk": 1,
+    "model": "feditor.testcasestep",
+    "fields": {
+      "url": "statuses/user_timeline.json",
+      "testcase": 1,
+      "params": "{\"count\": \"{random:1:d}\", \"screen_name\": \"alarin_ru\", \"trim_user\": \"true\"}",
+      "order": 1,
+      "method": "GET"
+    }
+  },
+  {
+    "pk": 3,
+    "model": "feditor.testcasestep",
+    "fields": {
+      "url": "statuses/user_timeline.json",
+      "testcase": 2,
+      "params": "{\"screen_name\": \"apitester_fake\"}",
+      "order": 1,
+      "method": "GET"
+    }
+  },
+  {
+    "pk": 4,
+    "model": "feditor.testcasestep",
+    "fields": {
+      "url": "statuses/update.json",
+      "testcase": 4,
+      "params": "{\"include_entities\": \"true\", \"status\": \"Test mention @{random:5:l} and tags #{random:5:l}\"}",
+      "order": 1,
+      "method": "POST"
+    }
+  },
+  {
+    "pk": 6,
+    "model": "feditor.testcasestep",
+    "fields": {
+      "url": "statuses/update.json",
+      "testcase": 5,
+      "params": "{\"status\": \"test-test-test\"}",
+      "order": 1,
+      "method": "POST"
+    }
+  },
+  {
+    "pk": 5,
+    "model": "feditor.testcasestep",
+    "fields": {
+      "url": "statuses/user_timeline.json",
+      "testcase": 4,
+      "params": "{\"include_entities\": \"true\", \"screen_name\": \"apitester_fake\"}",
+      "order": 2,
+      "method": "GET"
+    }
+  },
+  {
+    "pk": 7,
+    "model": "feditor.testcasestep",
+    "fields": {
+      "url": "statuses/update.json",
+      "testcase": 5,
+      "params": "{\"status\": \"test-test-test\"}",
+      "order": 2,
+      "method": "POST"
+    }
+  },
+  {
+    "pk": 1,
+    "model": "feditor.testcaseassert",
+    "fields": {
+      "operator": "eq",
+      "rhs": "0.json.text",
+      "lhs": ".json.0.text",
+      "order": 0,
+      "step": 3
+    }
+  },
+  {
+    "pk": 3,
+    "model": "feditor.testcaseassert",
+    "fields": {
+      "operator": "eq",
+      "rhs": "200",
+      "lhs": ".status_code",
+      "order": 1,
+      "step": 1
+    }
+  },
+  {
+    "pk": 4,
+    "model": "feditor.testcaseassert",
+    "fields": {
+      "operator": "eq",
+      "rhs": "0.json.0.entities.hashtags.0.text",
+      "lhs": ".json.0.entities.hashtags.0.text",
+      "order": 1,
+      "step": 5
+    }
+  },
+  {
+    "pk": 5,
+    "model": "feditor.testcaseassert",
+    "fields": {
+      "operator": "eq",
+      "rhs": "0.json.0.entities.user_mentions.0.text",
+      "lhs": ".json.0.entities.user_mentions.0.text",
+      "order": 2,
+      "step": 5
+    }
+  },
+  {
+    "pk": 6,
+    "model": "feditor.testcaseassert",
+    "fields": {
+      "operator": "eq",
+      "rhs": "200",
+      "lhs": ".status_code",
+      "order": 0,
+      "step": 4
+    }
+  },
+  {
+    "pk": 7,
+    "model": "feditor.testcaseassert",
+    "fields": {
+      "operator": "eq",
+      "rhs": "403",
+      "lhs": ".status_code",
+      "order": 1,
+      "step": 7
+    }
+  }
+]

@@ -10,7 +10,7 @@
           {% endif %}
         </a>
         <ul class="nav">
-          {% if user.is_authenticated and user.company.slug %}
+          {% if user.is_authenticated and user.fortuitusprofile.company.slug %}
             <li class="active"><a href="{% url fcore_projects_list company_slug=user.fortuitusprofile.company.slug %}">Projects</a></li>
           {% endif %}
 {#          <li><a href="{% url feditor_project company_slug='demo' project_slug='twitter' %}">DEMO EDIT</a></li>#}
