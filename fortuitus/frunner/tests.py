@@ -25,7 +25,8 @@ class TaskTestCase(BaseTestCase):
 
 class RunTestsTaskTestCase(BaseTestCase):
     def test_non_existing_test(self):
-        """ Should raise emodels.TestCase.DoesNotExist if test case not found
+        """
+        Should raise emodels.TestCase.DoesNotExist if test case not found.
         """
         with self.assertRaises(emodels.TestCase.DoesNotExist):
             run_tests(10000)
@@ -73,6 +74,21 @@ class RunTestsTaskTestCase(BaseTestCase):
         self.assertEqual(assertion_2_1.lhs, assertion_2_1_copy.lhs)
         self.assertEqual(assertion_2_1.rhs, assertion_2_1_copy.rhs)
         self.assertEqual(assertion_2_1.operator, assertion_2_1_copy.operator)
+
+    @mock.patch('fortuitus.frunner.models.TestCase.run', mock.Mock())
+    def test_test_cases_can_be_duplicated(self):
+        """
+        Should copy same TestCase twice without raising "primary key must be
+        unique" IntegrityError.
+        """
+        count = rmodels.TestCase.objects.all().count
+        test_case = efactories.TestCaseF.create()
+        self.assertEqual(count(), 0)
+        run_tests(test_case.pk)
+        self.assertEqual(count(), 1)
+        run_tests(test_case.pk)
+        self.assertEqual(count(), 2)
+        rmodels.TestCase.run.assert_has_calls([mock.call(), mock.call()])
 
 
 class TestCaseModelTestCase(BaseTestCase):
