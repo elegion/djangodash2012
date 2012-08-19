@@ -3,6 +3,7 @@ import logging
 from django.db import models
 from django.forms.models import model_to_dict
 from django.utils import timezone
+from furl import furl
 from jsonfield import JSONField
 import requests
 
@@ -143,9 +144,10 @@ class TestCaseStep(models_base.TestCaseStep):
         logger.info('Starting TestStep %s', self)
         self.start_date = timezone.now()
         try:
-            logger.info('Senging request: %s %s%s', self.method, testrun.base_url, self.url)
-            r = requests.request(self.method,
-                                 '%s%s' % (testrun.base_url, self.url))
+            url = furl(testrun.base_url)
+            url.join(self.url)
+            logger.info('Senging request: %s %s', self.method, url.url)
+            r = requests.request(self.method, url.url)
 
             logger.info('Received response: %s (headers: %s)', r.status_code, r.headers)
             logger.debug('Response body: %s', r.text)
