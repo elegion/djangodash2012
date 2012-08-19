@@ -32,8 +32,15 @@ class TestProject(models.Model):
 
 class TestCaseManager(models.Manager):
     new_name = 'New Test'
+
     def get_unique_new_name(self):
-        names = self.filter(name__istartswith=self.new_name).values_list('name', flat=True)
+        """
+        Generates unique test case name.
+
+        FIXME: thread unsafe, ugly method.
+        """
+        names = self.filter(name__istartswith=self.new_name) \
+                .values_list('name', flat=True)
         idx = 1
         while '%s %d' % (self.new_name, idx) in names:
             idx += 1
