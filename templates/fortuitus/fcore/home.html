@@ -9,7 +9,10 @@
     <p class="actions">
       <a href="{% url demo %}" class="btn btn-large btn-primary">Try Demo</a>
       {% if not user.is_authenticated %}
-        <a href="{% url signup %}" class="btn btn-large btn-success">Free Sign Up</a>
+        <a href="{% url signup %}" class="btn btn-large btn-success"
+           disabled="disabled" onclick="alert('Hey guys, we have only 48 hours!'); return false;">
+          Free Sign Up
+        </a>
       {% endif %}
     </p>
   </header>
@@ -64,12 +67,12 @@
         </p>
       </div>
 
-      <div class="span6 item">
+      <div class="span6 item marketing4">
         <!-- TODO big image on click -->
-        <img src="{{ STATIC_URL }}imgs/marketing_1.png" />
+        <img src="{{ STATIC_URL }}imgs/share.png" />
         <h3>Share in one click</h3>
         <p>
-          Share test-fails with developers in one click.
+          Share test-fails with developers in one click. By URL, EMail or Social networks.
         </p>
       </div>
     </div>

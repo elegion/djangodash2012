@@ -63,6 +63,10 @@
     .marketing3 img {
         border: none;
     }
+    .marketing4 img {
+        width: 140px;
+        height: 80px;
+    }
 
 .testimonials {
     margin: 1.5em 0 0 0;
