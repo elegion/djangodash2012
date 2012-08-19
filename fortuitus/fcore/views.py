@@ -2,14 +2,13 @@ from django.contrib import messages, auth
 from django.contrib.auth.models import User
 from django.shortcuts import redirect
 from django.template.response import TemplateResponse
-from django.views.generic.base import TemplateView
 
 from fortuitus.fcore import forms
 
 
-class Home(TemplateView):
+def home(request):
     """ Home page. """
-    template_name = 'fortuitus/fcore/home.html'
+    return TemplateResponse(request, 'fortuitus/fcore/home.html')
 
 
 def signup(request):

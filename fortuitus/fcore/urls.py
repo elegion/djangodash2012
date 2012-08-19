@@ -5,7 +5,7 @@ from fortuitus.fcore import views
 
 
 urlpatterns = patterns('',
-    url(r'^$', views.Home.as_view(), name='home'),
+    url(r'^$', views.home, name='home'),
     url(r'^logout/$', 'django.contrib.auth.views.logout',
         {'next_page': reverse_lazy('home')}, name='logout'),
     url(r'^login/$', 'django.contrib.auth.views.login',
