@@ -1,5 +1,6 @@
 from autoslug.fields import AutoSlugField
 from django.db import models
+from jsonfield import JSONField
 
 from fortuitus.feditor.dbfields import ParamsField
 
@@ -16,6 +17,9 @@ class Method:
 
 method_choices = [(f, f) for f in dir(Method) if not f.startswith('_')]
 operator_choices = [('eq', '=')]
+login_type_choices = [('basic', 'HTTP Basic Auth'),
+                      ('cookie', 'Login via login URL'),
+                      ('oauth', 'OAuth')]
 
 
 class Params(models.Model):
@@ -43,6 +47,9 @@ class TestCase(models.Model):
     name = models.CharField(max_length=100)
 
     need_login = models.BooleanField(default=False)
+    login_type = models.CharField(max_length=16, choices=login_type_choices,
+                                  null=True, blank=True)
+    login_options = JSONField(null=True, blank=True)
 
     class Meta:
         abstract = True
