@@ -15,6 +15,10 @@
     <dd>{{ test_case.end_date }}</dd>
     <dt>Result</dt>
     <dd>{{ test_case.result }}</dd>
+    {% if test_case.exception %}
+      <dt>Exception</dt>
+      <dd>{{ test_case.exception }}</dd>
+    {% endif %}
   </dl>
   {% endfor %}
 
