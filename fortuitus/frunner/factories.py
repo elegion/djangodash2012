@@ -15,6 +15,7 @@ class TestCaseF(factory.Factory):
 
     testrun = factory.SubFactory(TestRunF)
     name = factory.Sequence(lambda n: 'TestCase #%s' % n)
+    order = 1
 
 
 class TestCaseStepF(factory.Factory):
