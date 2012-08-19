@@ -2,6 +2,7 @@
   font-size: 200%;
   vertical-align: middle;
 }
+.testcase-header.result-fail .result-symbol,
 .testcase-header.result-error .result-symbol {
   color: #a00;
 }
@@ -12,3 +13,33 @@
 .testcase-header.result-pending .result-symbol {
   color: #aaa;
 }
+
+.teststeps-results {
+}
+  .teststeps-results li.result-error div.teststep-wrapper,
+  .teststeps-results li.result-fail div.teststep-wrapper {
+    margin: 0 0 0 -10px;
+    padding: 10px;
+    border: 1px solid #a00;
+
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+
+    -webkit-box-shadow: inset 0 0 10px #a00;
+    -moz-box-shadow: inset 0 0 10px #a00;
+    box-shadow: inset 0 0 10px #a00;
+  }
+  .teststeps-results li.result-,
+  .teststeps-results li.result-pending {
+    opacity: 0.5;
+  }
+  .teststeps-results .request-wrapper {
+    display: none;
+  }
+  .teststeps-results .response-header {
+    padding-top: 1em;
+  }
+  .teststeps-results .response-wrapper {
+    display: none;
+  }

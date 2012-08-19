@@ -2,20 +2,70 @@
   <span class="result-symbol">&bull;</span> {{ testcase.name }} ({{ testcase.start_date|default:'pending' }})
 </h2>
 
-<ol class="teststeps">
+<ol class="teststeps teststeps-results">
   {% for step in testcase.steps.all %}
-    <li><span>
-      <span class="method">{{ step.get_method_display }}</span> {{ step.url }}
-      <table class="params js_params table table-striped table-bordered">
-        <tbody>
-        {% for name, value in step.params.items %}
-          <tr class="step_{{ name }}">
-            <td class="name"><input type="hidden" name="js_{{ name }}" value="{{ value }}">{{ name }}</td>
-            <td class="value">{{ value }}</td>
-          </tr>
-        {% endfor %}
-        </tbody>
-      </table>
-    </span></li>
+    <li class="result-{{ step.result_str }}"><div class="teststep-wrapper">
+      <div>
+        <span class="method">{{ step.get_method_display }}</span>
+        {{ step.url }}
+        {% if step.params|length %}<a class="pseudo_link js_toggle_request" href="#">(toggle request)</a>{% endif %}
+      </div>
+      {% if step.params|length %}
+        <div class="request-wrapper js_request_wrapper">
+          <table class="params js_params table table-striped table-bordered">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Value</th>
+                <th>Expression</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for name, expression, value in step.get_params %}
+              <tr class="step_{{ name }}">
+                <td class="name">{{ name }}</td>
+                <td class="value">{{ value }}</td>
+                <td class="expression">{% if expression != value %}{{ expression }}{% endif %}</td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% endif %}
+      {% if step.exception %}<div class="alert alert-error">{{ step.exception }}</div>{% endif %}
+      {% if step.response_code %}
+        <div class="response-header">
+          <span class="method">{{ step.response_code }}</span>
+          {{ step.get_response_code_name }}
+          <a class="pseudo_link js_toggle_response" href="#">(toggle response)</a>
+        </div>
+        <div class="response-wrapper js_response_wrapper">
+          {% if step.response_headers %}
+            <table class="params js_params table table-striped table-bordered">
+              <thead>
+                <tr>
+                  <th>Header</th>
+                  <th>Value</th>
+                </tr>
+              </thead>
+              <tbody>
+              {% for name, value in step.response_headers.iteritems %}
+              <tr>
+                <td class="name">{{ name }}</td>
+                <td class="value">{{ value }}</td>
+              </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          {% endif %}
+          {% if step.response_body %}
+            <h4>Response body</h4>
+            <div class="well">{{ step.response_body }}</div>
+          {% else %}
+            <h4>Response body is empty</h4>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div></li>
   {% endfor %}
 </ol>

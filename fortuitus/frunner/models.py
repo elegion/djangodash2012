@@ -169,6 +169,7 @@ class TestCase(models_base.TestCase):
             except Exception, e:
                 logger.error('TestCase %s exception: %s', self, e)
                 logger.error(e)
+                self.exception = unicode(e)
                 self.result = TestResult.error
                 break
         else:
@@ -201,6 +202,23 @@ class TestCaseStep(models_base.TestCaseStep):
     response_headers = JSONField(null=True, blank=True)
     response_body = models.TextField(null=True, blank=True)
 
+    def result_str(self):
+        return self.result or TestResult.pending
+
+    def get_params(self):
+        """ Returns [(resolved_param.name, param.value, resolved_param.value)]
+        """
+        if self.resolved_params:
+            for name, value in self.resolved_params.iteritems():
+                yield name, self.params[name], value
+
+    def get_response_code_name(self):
+        from requests.status_codes import _codes
+        try:
+            return _codes[self.response_code][0].upper().replace('_', ' ')
+        except IndexError:
+            return 'UNKNOWN'
+
     def run(self, testrun, testcase, session, responses):
         """ Runs test case step. """
         logger.info('Starting TestStep %s', self)
@@ -211,16 +229,14 @@ class TestCaseStep(models_base.TestCaseStep):
         try:
             url = furl(testrun.base_url)
             url.join(self.url)
-            logger.info('Senging request: %s %s%s', self.method, testrun.base_url, self.url)
+            logger.info('Senging request: %s %s', self.method, url.url)
             if self.method in (models_base.Method.POST, models_base.Method.PUT, models_base.Method.PATCH):
                 data = self.resolved_params
                 params = {}
             else:
                 data = {}
                 params = self.resolved_params
-            r = session.request(self.method,
-                                 '%s%s' % (testrun.base_url, self.url),
-                                 data=data, params=params)
+            r = session.request(self.method, url.url, data=data, params=params)
 
             logger.info('Received response: %s (headers: %s)', r.status_code, r.headers)
             logger.debug('Response body: %s', r.text)

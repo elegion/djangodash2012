@@ -2,6 +2,16 @@
 /*@import url(http://fonts.googleapis.com/css?family=Jura&subset=latin,cyrillic-ext);*/
 @import url(http://fonts.googleapis.com/css?family=Open+Sans:400,700&subset=latin,cyrillic-ext);
 @import url(http://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700&subset=latin,cyrillic-ext);
+
+.pseudo_link {
+  text-decoration: none;
+  border-bottom: 1px dashed #0088cc;
+}
+.pseudo_link:hover {
+  text-decoration: none;
+  border-bottom-color: #005580;
+}
+
 .masthead {
     /*font-family: 'Jura', sans-serif;*/
     font-family: 'Open Sans', sans-serif;
@@ -145,7 +155,7 @@ h2 {
     .teststeps li .method {
         color: #999;
     }
-    .teststeps li span {
+    .teststeps li div {
         font-size: 15px; /*@baseFontSize * 1.2 */
         vertical-align: top;
     }
