@@ -99,11 +99,6 @@ class TestCase(models_base.TestCase):
         self.save()
 
 
-class Params(models_base.Params):
-    """ HTTP request parameters for test cases. """
-    pass
-
-
 class TestCaseStep(models_base.TestCaseStep):
     """
     Contains information about test step run result.

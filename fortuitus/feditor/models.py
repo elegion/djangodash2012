@@ -30,11 +30,6 @@ class TestProject(models.Model):
         return u'%s (%s)' % (self.name, self.base_url)
 
 
-class Params(models_base.Params):
-    """ HTTP request parameters for test cases. """
-    pass
-
-
 class TestCaseManager(models.Manager):
     new_name = 'New Test'
     def get_unique_new_name(self):

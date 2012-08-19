@@ -22,14 +22,6 @@ login_type_choices = [('basic', 'HTTP Basic Auth'),
                       ('oauth', 'OAuth')]
 
 
-class Params(models.Model):
-    """ HTTP request parameters for test cases. """
-    pass
-
-    class Meta:
-        abstract = True
-
-
 class TestCase(models.Model):
     """
     Test case.
