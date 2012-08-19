@@ -53,3 +53,23 @@ class ProjectsListTestCase(BaseTestCase):
                       kwargs={'company_slug': company.slug})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
+
+
+class QueryCountTestCase(BaseTestCase):
+    def test_home_page(self):
+        with self.assertNumQueries(0):
+            self.client.get(reverse('home'))
+
+    def test_sign_up(self):
+        with self.assertNumQueries(0):
+            self.client.get(reverse('signup'))
+
+    def test_demo(self):
+        with self.assertNumQueries(18):
+            self.client.get(reverse('demo'))
+
+    def test_project_list(self):
+        self.client.get(reverse('demo'))
+        with self.assertNumQueries(6):
+            self.client.get(reverse('fcore_projects_list',
+                                    kwargs={'company_slug': 'demo'}))
