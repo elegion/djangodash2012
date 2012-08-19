@@ -469,9 +469,9 @@ class RunnerViewsTestCase(TestCase):
         """ Tests project list page is rendered properly. """
         project = efactories.TestProjectF.create()
         case = rfactories.TestCaseF.create()
-        url = reverse('frunner_test_case',
+        url = reverse('frunner_testrun',
                       kwargs={'project_id': project.pk,
-                              'test_case_id': case.pk})
+                              'testrun_id': case.testrun_id})
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
-        self.assertTemplateUsed('fortuitus/frunner/test_case.html')
+        self.assertTemplateUsed('fortuitus/frunner/testrun.html')

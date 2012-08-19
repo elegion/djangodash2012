@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 
 from fortuitus.feditor.models import TestProject
-from fortuitus.frunner.models import TestCase
+from fortuitus.frunner.models import TestRun
 
 
 def projects(request):
@@ -29,13 +29,13 @@ def project_runs(request, project_id):
                             context)
 
 
-def test_case(request, project_id, test_case_id):
+def testrun(request, project_id, testrun_id):
     """
     Shows test run details.
     """
     project = get_object_or_404(TestProject, pk=project_id)
-    test_case = get_object_or_404(TestCase, pk=test_case_id)
+    testrun = get_object_or_404(TestRun, pk=testrun_id)
     context = {'project': project,
-               'test_case': test_case}
-    return TemplateResponse(request, 'fortuitus/frunner/test_case.html',
+               'test_case': testrun}
+    return TemplateResponse(request, 'fortuitus/frunner/testrun.html',
                             context)

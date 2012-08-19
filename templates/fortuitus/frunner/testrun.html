@@ -5,7 +5,10 @@
     <h1>Project “{{ project.name }}” run</h1>
   </header>
 
+  {% for test_case in testrun.testcases.all %}
   <dl class="run_details">
+    <dt>Name</dt>
+    <dd>{{ test_case.name }}</dd>
     <dt>Start</dt>
     <dd>{{ test_case.start_date }}</dd>
     <dt>End</dt>
@@ -13,5 +16,6 @@
     <dt>Result</dt>
     <dd>{{ test_case.result }}</dd>
   </dl>
+  {% endfor %}
 
 {% endblock %}
