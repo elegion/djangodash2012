@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 import factory
+
 from fortuitus.fcore import models
 
 
