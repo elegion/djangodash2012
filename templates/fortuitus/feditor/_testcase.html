@@ -1,12 +1,12 @@
 {% load bootstrap %}
 
 <h2 class="testcase-header">
-    {{ testcase.name }} <small>{% if testcase.need_login %}needs login{% endif %}</small>
-    <form class="delete_form" method="post">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="delete_testcase">
-        <input type="hidden" name="testcase" value="{{ testcase.pk }}">
-    </form>
+  {{ testcase.name }} <small>{% if testcase.need_login %}needs login{% endif %}</small>
+  <form class="delete_form" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="delete_testcase">
+    <input type="hidden" name="testcase" value="{{ testcase.pk }}">
+  </form>
 </h2>
 
 <div class="well js-param-help param-help">
@@ -31,61 +31,61 @@
 </div>
 
 <ol class="teststeps">
-    {% for step in testcase.steps.all %}
-        <li>
-            <form method="post" class="js_params form-inline">
-                <div class="head">
-                    <span class="method js_show">{{ step.get_method_display }}</span>
-                    <select class="js_edit edit_method input-small" style="display:none" name="method" value="{{ step.method }}">
-                        {% for n, v in methods %}
-                        <option value="{{ v }}"{% if v == step.method %} selected="selected"{% endif %}>{{ n }}</option>
-                        {% endfor %}
-                    </select>
-                    <span class="url js_show">{{ step.url }}</span>
-                    <input type="text" class="js_edit edit_url" style="display:none" name="url" value="{{ step.url }}">
-                </div>
+  {% for step in testcase.steps.all %}
+    <li>
+      <form method="post" class="js_params form-inline">
+        <div class="head">
+          <span class="method js_show">{{ step.get_method_display }}</span>
+          <select class="js_edit edit_method input-small" style="display:none" name="method" value="{{ step.method }}">
+            {% for n, v in methods %}
+              <option value="{{ v }}"{% if v == step.method %} selected="selected"{% endif %}>{{ n }}</option>
+            {% endfor %}
+          </select>
+          <span class="url js_show">{{ step.url }}</span>
+          <input type="text" class="js_edit edit_url" style="display:none" name="url" value="{{ step.url }}">
+        </div>
 
-                {% csrf_token %}
-                <input type="hidden" name="teststep" value="{{ step.pk }}">
-                <table class="params table table-striped table-bordered">
-                <tbody>
-                {% for name, value in step.params.items %}
-                    <tr class="step_{{ name }}">
-                        <td class="name"><input type="hidden" name="js_{{ name }}" value="{{ value }}">
-                            <span>{{ name }}</span></td>
-                        <td class="value"><span>{{ value }}</span></td>
-                    </tr>
-                {% endfor %}
-                <tr class="step_{{ name }} row_template" style="display:none">
-                    <td class="name"><span></span><input type="hidden" name="" value="">{{ name }}</td>
-                    <td class="value"><span></span></td>
-                </tr>
-                </tbody>
-                </table>
-                <div class="form-action" style="display:none">
-                    <button class="btn btn-primary js_save btn-save-step"name="action" value="save_step">Save</button>
-                    <button class="btn btn-danger btn-delete-step" name="action" value="delete_step" onclick="return confirm('sure?');">Delete</button>
-                </div>
-            </form>
-        </li>
-        {% for assert in step.assertions.all %}
-        <li class="assert">
-          <form method="post" class="edit-assert-form form-inline">
-            {% csrf_token %}
-            <input type="hidden" name="assert" value="{{ assert.pk }}">
+        {% csrf_token %}
+        <input type="hidden" name="teststep" value="{{ step.pk }}">
+        <table class="params table table-striped table-bordered">
+          <tbody>
+            {% for name, value in step.params.items %}
+              <tr class="step_{{ name }}">
+                <td class="name"><input type="hidden" name="js_{{ name }}" value="{{ value }}">
+                  <span>{{ name }}</span></td>
+                <td class="value"><span>{{ value }}</span></td>
+              </tr>
+            {% endfor %}
+            <tr class="step_{{ name }} row_template" style="display:none">
+              <td class="name"><span></span><input type="hidden" name="" value="">{{ name }}</td>
+              <td class="value"><span></span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="form-action" style="display:none">
+          <button class="btn btn-primary js_save btn-save-step"name="action" value="save_step">Save</button>
+          <button class="btn btn-danger btn-delete-step" name="action" value="delete_step" onclick="return confirm('sure?');">Delete</button>
+        </div>
+      </form>
+    </li>
+    {% for assert in step.assertions.all %}
+      <li class="assert">
+        <form method="post" class="edit-assert-form form-inline">
+          {% csrf_token %}
+          <input type="hidden" name="assert" value="{{ assert.pk }}">
 
-            <i class="icon-ok-sign-big"></i>
-            <span class="lhs js_show">{{ assert.lhs }}</span>
-            <input type="text" name="lhs" value="{{ assert.lhs }}" class="js_edit" style="display:none">
-            <span class="operator">{{ assert.get_operator_display }}</span>
-            <span class="rhs js_show">{{ assert.rhs }}</span>
-            <input type="text" name="rhs" value="{{ assert.rhs }}" class="js_edit" style="display:none">
-            <button class="btn btn-primary js-btn-save-assert
-              btn-save-assert"name="action" value="save_assert" style="display:none">Save</button>
-          </form>
-        </li>
-        {% endfor %}
+          <i class="icon-ok-sign-big"></i>
+          <span class="lhs js_show">{{ assert.lhs }}</span>
+          <input type="text" name="lhs" value="{{ assert.lhs }}" class="js_edit" style="display:none">
+          <span class="operator">{{ assert.get_operator_display }}</span>
+          <span class="rhs js_show">{{ assert.rhs }}</span>
+          <input type="text" name="rhs" value="{{ assert.rhs }}" class="js_edit" style="display:none">
+          <button class="btn btn-primary js-btn-save-assert
+            btn-save-assert"name="action" value="save_assert" style="display:none">Save</button>
+        </form>
+      </li>
     {% endfor %}
+  {% endfor %}
 </ol>
 
 <form method="post" class="add_step_form js_params" style="display: none">
@@ -124,6 +124,6 @@
 </form>
 
 <p class="add-buttons">
-<button class="js-btn-add-test add-test btn">Add Query</button>
-<button class="js-btn-add-assert add-assert btn">Add Assert</button>
+  <button class="js-btn-add-test add-test btn">Add Query</button>
+  <button class="js-btn-add-assert add-assert btn">Add Assert</button>
 </p>
