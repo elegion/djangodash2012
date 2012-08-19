@@ -7,6 +7,6 @@ admin.autodiscover()
 urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'', include('fortuitus.fcore.urls')),
-    url(r'^editor/', include('fortuitus.feditor.urls')),
-    url(r'^runs/', include('fortuitus.frunner.urls')),
+    url(r'', include('fortuitus.feditor.urls')),
+    url(r'', include('fortuitus.frunner.urls')),
 )

@@ -457,17 +457,12 @@ class ResolversTestCase(TestCase):
 
 
 class RunnerViewsTestCase(TestCase):
-    def test_projects(self):
-        """ Tests project list page is rendered properly. """
-        response = self.client.get(reverse('frunner_projects'))
-        self.assertEqual(200, response.status_code)
-        self.assertTemplateUsed('fortuitus/frunner/projects.html')
-
     def test_project_runs(self):
         """ Tests project list page is rendered properly. """
         project = efactories.TestProjectF.create()
         url = reverse('frunner_project_runs',
-                      kwargs={'project_slug': project.slug})
+                      kwargs={'company_slug': project.company.slug,
+                              'project_slug': project.slug})
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
         self.assertTemplateUsed('fortuitus/frunner/project_runs.html')
@@ -477,7 +472,8 @@ class RunnerViewsTestCase(TestCase):
         project = efactories.TestProjectF.create()
         case = rfactories.TestCaseF.create(testrun__project=project)
         url = reverse('frunner_testrun',
-                      kwargs={'project_slug': project.slug,
+                      kwargs={'company_slug': project.company.slug,
+                              'project_slug': project.slug,
                               'testrun_number': case.testrun.pk})
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
@@ -486,14 +482,18 @@ class RunnerViewsTestCase(TestCase):
     def test_run_project(self):
         case = efactories.TestCaseF.create()
         url = reverse('frunner_run_project',
-                      kwargs={'project_slug': case.project.slug})
+                      kwargs={'company_slug': case.project.company.slug,
+                              'project_slug': case.project.slug})
         self.assertEqual(0, rmodels.TestRun.objects.count())
 
         response = self.client.post(url)
 
         self.assertEqual(1, rmodels.TestRun.objects.count())
-        self.assertRedirects(response, reverse('frunner_testrun', kwargs={'project_slug': case.project.slug,
-                                                                          'testrun_number': rmodels.TestRun.objects.all()[0].pk}))
+        url = reverse('frunner_testrun',
+                      kwargs={'company_slug': case.project.company.slug,
+                              'project_slug': case.project.slug,
+                              'testrun_number': rmodels.TestRun.objects.all()[0].pk})
+        self.assertRedirects(response, url)
 
 
 class RegressionTestCase(BaseTestCase):

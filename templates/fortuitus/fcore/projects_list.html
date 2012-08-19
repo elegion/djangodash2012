@@ -11,7 +11,7 @@
   <ul class="projects">
     {% for project in projects %}
       <li>
-        <a href="{% url frunner_project_runs project_slug=project.slug %}">
+        <a href="{% url frunner_project_runs company_slug=company.slug project_slug=project.slug %}">
           {{ project.name }}
         </a>
       </li>

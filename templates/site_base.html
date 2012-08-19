@@ -9,8 +9,7 @@
           {% if user.is_authenticated %}
             <li class="active"><a href="{% url fcore_projects_list company_slug=user.fortuitusprofile.company.slug %}">Projects</a></li>
           {% endif %}
-          <li><a href="{% url frunner_projects %}">Runs</a></li>
-          <li><a href="{% url feditor_project company='demo' project='twitter' %}">DEMO EDIT</a></li>
+          <li><a href="{% url feditor_project company_slug='demo' project_slug='twitter' %}">DEMO EDIT</a></li>
         </ul>
         <ul class="nav pull-right">
           <li><a href="{% url logout %}">&times; Logout</a></li>
