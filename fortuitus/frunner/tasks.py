@@ -32,11 +32,11 @@ def run_tests(project_id):
         rtest = rmodels.TestCase.objects.create(testrun=testrun, **kwargs)
 
         for estep in etest.steps.all():
-            kwargs = model_to_dict(estep, exclude=['testcase'])
+            kwargs = model_to_dict(estep, exclude=['id', 'testcase'])
             rstep = rmodels.TestCaseStep.objects.create(testcase=rtest, **kwargs)
 
             for assertion in estep.assertions.all():
-                kwargs = model_to_dict(assertion, exclude=['step'])
+                kwargs = model_to_dict(assertion, exclude=['id', 'step'])
                 rmodels.TestCaseAssert.objects.create(step=rstep, **kwargs)
 
     testrun.run()

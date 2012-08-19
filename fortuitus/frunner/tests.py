@@ -83,6 +83,10 @@ class RunTestsTaskTestCase(BaseTestCase):
         """
         count = rmodels.TestCase.objects.all().count
         test_case = efactories.TestCaseF.create()
+        step = efactories.TestCaseStepF.create(testcase=test_case)
+        efactories.TestCaseStepF.create(testcase=test_case)
+        efactories.TestCaseAssertF.create(step=step)
+        efactories.TestCaseAssertF.create(step=step)
         self.assertEqual(count(), 0)
         run_tests(test_case.project_id)
         self.assertEqual(count(), 1)
