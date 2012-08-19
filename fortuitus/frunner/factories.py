@@ -8,6 +8,7 @@ class TestRunF(factory.Factory):
     FACTORY_FOR = models.TestRun
 
     project = factory.SubFactory(TestProjectF)
+    base_url = 'http://api.example.com/'
 
 
 class TestCaseF(factory.Factory):
