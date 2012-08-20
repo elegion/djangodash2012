@@ -15,6 +15,13 @@ What
 
 Online tool to create automatic acceptance tests for REST/JSON APIs.
 
+Testing
+-------
+
+If you accidentally deleted demo testcases, you always can use demo fixtures:
+
+    python manage.py loaddata fixtures/demo/editor.json fixtures/demo/auth.json
+
 Tips and tricks
 ---------------
 

@@ -167,7 +167,7 @@
     "fields": {
       "url": "statuses/update.json",
       "testcase": 4,
-      "params": "{\"include_entities\": \"true\", \"status\": \"Test mention @{random:5:l} and tags #{random:5:l}\"}",
+      "params": "{\"include_entities\": \"true\", \"status\": \"Test mention @apitester_fake and tags #{random:5:l}\"}",
       "order": 1,
       "method": "POST"
     }
@@ -210,7 +210,7 @@
     "model": "feditor.testcaseassert",
     "fields": {
       "operator": "eq",
-      "rhs": "0.json.text",
+      "rhs": "0.json.0.text",
       "lhs": ".json.0.text",
       "order": 0,
       "step": 3
@@ -243,8 +243,8 @@
     "model": "feditor.testcaseassert",
     "fields": {
       "operator": "eq",
-      "rhs": "0.json.0.entities.user_mentions.0.text",
-      "lhs": ".json.0.entities.user_mentions.0.text",
+      "rhs": "0.json.0.entities.user_mentions.0.screen_name",
+      "lhs": ".json.0.entities.user_mentions.0.screen_name",
       "order": 2,
       "step": 5
     }
